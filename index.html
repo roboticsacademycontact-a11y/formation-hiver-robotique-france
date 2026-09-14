@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Formation d'hiver Robotique — Les Petits Génies de la Robotique · France</title>
+<meta name="description" content="Formation annuelle de robotique pour enfants et ados à Metz &amp; Thionville, du 7 octobre au 30 juin : Scratch, Python, C, Arduino, ESP32, conception 3D, IoT &amp; IA."/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#050a18;--bg2:#0a1226;--bg3:#101c38;
+  --accent:#7de3ff;--accent2:#a78bfa;--accent3:#3b82f6;
+  --gold:#e6f4ff;--green:#5ef2c0;
+  --text:#eaf2ff;--muted:#8fa0c4;--card:#101c38;--border:rgba(125,227,255,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ===== NEIGE ===== */
+body::before,body::after{content:'';position:fixed;left:0;right:0;top:-100%;height:200%;pointer-events:none;z-index:0;}
+body::before{background-image:
+  radial-gradient(2px 2px at 12% 8%,rgba(255,255,255,.85),transparent),
+  radial-gradient(1.6px 1.6px at 38% 22%,rgba(255,255,255,.7),transparent),
+  radial-gradient(2px 2px at 63% 12%,rgba(255,255,255,.8),transparent),
+  radial-gradient(1.4px 1.4px at 88% 30%,rgba(255,255,255,.65),transparent),
+  radial-gradient(1.8px 1.8px at 25% 41%,rgba(255,255,255,.75),transparent);
+  background-size:520px 520px;animation:snowfall 26s linear infinite;opacity:.7;}
+body::after{background-image:
+  radial-gradient(1.2px 1.2px at 5% 15%,rgba(190,230,255,.7),transparent),
+  radial-gradient(1px 1px at 47% 33%,rgba(190,230,255,.6),transparent),
+  radial-gradient(1.4px 1.4px at 74% 20%,rgba(190,230,255,.65),transparent),
+  radial-gradient(1px 1px at 93% 46%,rgba(190,230,255,.5),transparent);
+  background-size:330px 330px;animation:snowfall 16s linear infinite;opacity:.5;}
+@keyframes snowfall{from{transform:translateY(0)}to{transform:translateY(25%)}}
+
+/* ===== BANDEAU ESSAI ===== */
+.topbar{position:relative;z-index:120;background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent2));background-size:200% 100%;animation:shine 6s linear infinite;color:#061024;text-align:center;padding:.6rem 1rem;font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;letter-spacing:.5px;}
+.topbar a{color:#061024;text-decoration:underline;white-space:nowrap;}
+@keyframes shine{0%{background-position:0% 0}100%{background-position:200% 0}}
+@media(max-width:600px){.topbar{font-size:.7rem;padding:.55rem .8rem;}}
+
+/* ===== HERO ===== */
+header{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 1.2rem;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(125,227,255,.13),transparent 70%),radial-gradient(ellipse 55% 45% at 80% 85%,rgba(167,139,250,.12),transparent 60%),var(--bg);overflow:hidden;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(125,227,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(125,227,255,.05) 1px,transparent 1px);background-size:50px 50px;animation:gridPulse 8s ease-in-out infinite;}
+@keyframes gridPulse{0%,100%{opacity:.5}50%{opacity:1}}
+.logo-img{width:165px;height:auto;position:relative;z-index:1;filter:drop-shadow(0 0 25px rgba(125,227,255,.4));animation:float 5s ease-in-out infinite, fadeDown 1s ease both;background:rgba(255,255,255,.96);border-radius:50%;padding:8px;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-25px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+.badge-top{font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:4px;color:var(--accent);border:1px solid var(--border);border-radius:20px;padding:.45rem 1.3rem;margin:1.5rem 0 1rem;position:relative;z-index:1;animation:fadeDown .8s ease both;}
+h1.brand{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3.4rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),#ffffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.12;margin-bottom:.5rem;position:relative;z-index:1;animation:fadeUp 1s ease .3s both;}
+.brand-sub{font-family:'Orbitron',sans-serif;font-size:clamp(.7rem,2vw,1rem);color:var(--accent);letter-spacing:3px;position:relative;z-index:1;animation:fadeUp 1s ease .4s both;}
+.hero-dates{display:inline-block;margin-top:.9rem;font-family:'Space Mono',monospace;font-size:clamp(.78rem,1.7vw,.95rem);color:#061024;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:.5rem 1.4rem;border-radius:30px;font-weight:700;position:relative;z-index:1;animation:fadeUp 1s ease .5s both;}
+.hero-essai{display:inline-block;margin-top:.7rem;font-family:'Orbitron',sans-serif;font-size:clamp(.72rem,1.6vw,.88rem);color:var(--green);border:1px solid rgba(94,242,192,.45);background:rgba(94,242,192,.08);padding:.45rem 1.2rem;border-radius:30px;letter-spacing:1px;position:relative;z-index:1;animation:fadeUp 1s ease .55s both, pulseEssai 3s ease-in-out 2s infinite;}
+@keyframes pulseEssai{0%,100%{box-shadow:0 0 0 0 rgba(94,242,192,0)}50%{box-shadow:0 0 18px 0 rgba(94,242,192,.35)}}
+.hero-tagline{font-size:clamp(.95rem,1.8vw,1.2rem);color:var(--text);margin:1.4rem auto;max-width:620px;font-weight:300;line-height:1.6;position:relative;z-index:1;animation:fadeUp 1s ease .6s both;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin:1.2rem 0;position:relative;z-index:1;animation:fadeUp 1s ease .8s both;}
+.tag{background:rgba(125,227,255,.08);border:1px solid var(--border);border-radius:8px;padding:.45rem 1rem;font-size:.82rem;color:var(--accent);font-family:'Space Mono',monospace;letter-spacing:1px;}
+.cta-hero{display:inline-block;margin-top:1.4rem;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#061024;font-family:'Orbitron',sans-serif;font-weight:700;font-size:1rem;text-decoration:none;padding:.95rem 2.4rem;border-radius:40px;box-shadow:0 8px 30px rgba(167,139,250,.4);position:relative;z-index:1;transition:transform .25s,box-shadow .25s;animation:fadeUp 1s ease 1s both;}
+.cta-hero:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 40px rgba(125,227,255,.5);}
+
+/* ===== NAV ===== */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,10,24,.93);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.7rem 1rem;}
+.nav-inner{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;max-width:1000px;margin:0 auto;}
+nav a{color:var(--muted);text-decoration:none;font-size:.75rem;font-family:'Space Mono',monospace;letter-spacing:1px;padding:.35rem .7rem;border-radius:4px;border:1px solid transparent;transition:.3s;}
+nav a:hover{color:var(--accent);border-color:var(--border);background:rgba(125,227,255,.05);}
+
+/* ===== SECTION ===== */
+section{position:relative;padding:4.5rem 1.5rem;max-width:1100px;margin:0 auto;z-index:1;}
+.section-header{text-align:center;margin-bottom:2.8rem;}
+.section-label{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent2);letter-spacing:4px;display:block;margin-bottom:.7rem;}
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.8vw,2rem);font-weight:700;color:var(--text);margin-bottom:.7rem;}
+.section-sub{color:var(--muted);font-size:.92rem;line-height:1.7;max-width:640px;margin:0 auto;}
+
+/* ===== QUICK INFO ===== */
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.2rem;max-width:1000px;margin:0 auto;}
+.qcard{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:1.6rem 1rem;text-align:center;position:relative;overflow:hidden;transition:transform .3s,border-color .3s;}
+.qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.qcard:hover{transform:translateY(-5px);border-color:var(--border);}
+.qcard .ic{font-size:2.2rem;}
+.qcard .t{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--text);margin-top:.5rem;}
+.qcard .d{font-size:.8rem;color:var(--muted);margin-top:.3rem;}
+
+/* ===== CARDS ===== */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.8rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card.c1::before{background:linear-gradient(90deg,var(--accent2),#ffffff);}
+.card.c2::before{background:linear-gradient(90deg,var(--accent),var(--accent3));}
+.card.c3::before{background:linear-gradient(90deg,var(--green),var(--accent));}
+.card:hover{transform:translateY(-6px);border-color:rgba(125,227,255,.3);box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 25px rgba(125,227,255,.08);}
+.card-icon{font-size:2.6rem;margin-bottom:.8rem;display:block;}
+.card-title{font-family:'Orbitron',sans-serif;font-size:1.05rem;color:var(--text);margin-bottom:.5rem;font-weight:700;}
+.card p{color:var(--muted);font-size:.85rem;line-height:1.6;}
+.card .lvl{display:inline-block;margin-top:.7rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);border:1px solid var(--border);border-radius:20px;padding:.2rem .7rem;}
+
+/* ===== TABLE ===== */
+.sched-wrap{overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.07);}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:640px;}
+th,td{padding:.85rem .6rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);}
+thead th{background:rgba(125,227,255,.08);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:.82rem;letter-spacing:.5px;}
+tbody tr:hover{background:rgba(125,227,255,.03);}
+td.slot{font-family:'Space Mono',monospace;color:var(--accent);font-size:.9rem;font-weight:700;white-space:nowrap;background:rgba(125,227,255,.04);}
+.pill{display:inline-block;padding:.3rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700;font-family:'Space Mono',monospace;line-height:1.35;}
+.pill b{display:block;font-weight:400;font-size:.63rem;opacity:.75;letter-spacing:.3px;margin-top:.1rem;}
+.p1{background:rgba(167,139,250,.16);color:#c4b1ff;border:1px solid rgba(167,139,250,.35);}
+.p2{background:rgba(125,227,255,.12);color:var(--accent);border:1px solid var(--border);}
+.p3{background:rgba(94,242,192,.12);color:var(--green);border:1px solid rgba(94,242,192,.3);}
+.p4{background:rgba(230,244,255,.1);color:#dbeeff;border:1px solid rgba(230,244,255,.3);}
+.pause{background:rgba(230,244,255,.05);color:var(--gold);font-family:'Space Mono',monospace;font-size:.74rem;letter-spacing:1px;}
+td.closed{color:#5a6a92;font-family:'Space Mono',monospace;font-size:.72rem;background:rgba(255,255,255,.02);}
+td.slot small{color:#5a6a92;font-size:.68rem;}
+.city-head{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--accent);text-align:center;margin:2.2rem 0 1rem;letter-spacing:1px;line-height:1.6;}
+.city-head small{display:block;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:1px;margin-top:.25rem;}
+
+/* ===== FINALE ===== */
+.finale{max-width:920px;margin:0 auto;text-align:center;background:linear-gradient(135deg,rgba(125,227,255,.08),rgba(167,139,250,.09));border:1px solid var(--border);border-radius:22px;padding:3rem 2rem;position:relative;overflow:hidden;}
+.finale .big{font-size:4rem;}
+.finale h2{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,3vw,2rem);background:linear-gradient(135deg,var(--accent),#ffffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.5rem 0;}
+.finale p{color:var(--muted);font-size:1rem;max-width:660px;margin:.6rem auto 0;line-height:1.7;}
+.finale .badge{display:inline-block;margin-top:1.5rem;background:linear-gradient(135deg,var(--green),var(--accent));color:#061024;font-family:'Orbitron',sans-serif;font-weight:700;font-size:.95rem;padding:.7rem 1.8rem;border-radius:40px;}
+
+/* ===== FORM ===== */
+.form-sec{background:linear-gradient(180deg,var(--bg2),var(--bg));}
+form{max-width:680px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.4rem 2rem;box-shadow:0 20px 60px rgba(0,0,0,.45);}
+.row{display:flex;gap:1.2rem;flex-wrap:wrap;}
+.field{flex:1;min-width:220px;margin-bottom:1.2rem;}
+label{display:block;font-family:'Space Mono',monospace;font-weight:700;margin-bottom:.5rem;font-size:.78rem;color:var(--accent);letter-spacing:.5px;}
+label .req{color:var(--accent2);}
+input,select,textarea{width:100%;padding:.85rem 1rem;background:var(--bg);border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:.92rem;font-family:'Exo 2',sans-serif;color:var(--text);transition:border .2s,box-shadow .2s;}
+input::placeholder,textarea::placeholder{color:#4a5578;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(125,227,255,.14);}
+select option{background:var(--bg2);}
+.submit{width:100%;margin-top:.6rem;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#061024;border:none;padding:1.1rem;font-size:1.05rem;font-weight:700;font-family:'Orbitron',sans-serif;border-radius:40px;cursor:pointer;box-shadow:0 8px 26px rgba(167,139,250,.4);transition:transform .2s,box-shadow .2s;letter-spacing:.5px;}
+.submit:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(125,227,255,.5);}
+.btn-row{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-row .submit{flex:1;min-width:230px;margin-top:.6rem;}
+.submit-email{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;box-shadow:0 8px 26px rgba(125,227,255,.35);}
+.submit-email:hover{box-shadow:0 12px 34px rgba(125,227,255,.5);}
+.submit-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 8px 26px rgba(37,211,102,.35);}
+.submit-wa:hover{box-shadow:0 12px 34px rgba(37,211,102,.5);}
+.submit-full{width:100%;}
+.btn-row-mt{margin-top:.8rem;}
+.hint{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.45rem;line-height:1.5;}
+select:disabled{opacity:.55;cursor:not-allowed;}
+.note{text-align:center;font-size:.74rem;color:var(--muted);margin-top:1rem;font-family:'Space Mono',monospace;}
+#ok{display:none;max-width:680px;margin:1.2rem auto 0;background:rgba(94,242,192,.1);color:var(--green);border:1px solid rgba(94,242,192,.3);border-radius:14px;padding:1.2rem;text-align:center;font-weight:700;font-size:1rem;line-height:1.6;}
+#ok.err{background:rgba(255,120,120,.1);color:#ffb4b4;border-color:rgba(255,120,120,.35);}
+#ok a{color:inherit;}
+.walink{color:#25d366;text-decoration:none;font-weight:700;}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;}
+.submit:disabled{opacity:.6;cursor:progress;transform:none;}
+
+/* ===== CRÉNEAUX ===== */
+.slot-choice{display:flex;align-items:center;justify-content:center;gap:1.2rem;flex-wrap:wrap;max-width:880px;margin:0 auto 1.6rem;}
+.slot-opt{display:flex;flex-direction:column;align-items:center;gap:.25rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.6rem;min-width:200px;text-align:center;}
+.slot-opt strong{font-family:'Orbitron',sans-serif;font-size:.9rem;color:var(--accent);}
+.slot-opt span{font-family:'Space Mono',monospace;color:var(--gold);font-size:1.05rem;font-weight:700;}
+.slot-vs{font-family:'Orbitron',sans-serif;color:var(--accent2);font-size:1rem;font-weight:700;}
+.price-text{font-size:2.1rem !important;background:linear-gradient(135deg,var(--green),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.proj-chips{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin:1.4rem auto 0;max-width:660px;}
+.proj-chips span{background:rgba(125,227,255,.08);border:1px solid var(--border);border-radius:20px;padding:.4rem .9rem;font-size:.8rem;color:var(--text);font-family:'Space Mono',monospace;}
+
+/* ===== TARIFS ===== */
+.price-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:920px;margin:0 auto;align-items:stretch;}
+.price-main{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2rem;position:relative;overflow:hidden;text-align:center;}
+.price-main::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
+.price-label{font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:2px;color:var(--accent);}
+.price-amount{font-family:'Orbitron',sans-serif;font-size:3.6rem;font-weight:900;color:var(--gold);line-height:1.15;margin:.4rem 0;}
+.price-per{font-size:.82rem;color:var(--muted);margin-bottom:1.3rem;}
+.price-incl{list-style:none;text-align:left;}
+.price-incl li{font-size:.85rem;color:var(--text);padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.price-promos{display:flex;flex-direction:column;gap:1rem;justify-content:center;}
+.promo{display:flex;align-items:center;gap:1.1rem;background:var(--card);border:1px solid rgba(94,242,192,.2);border-radius:14px;padding:1.1rem 1.3rem;transition:transform .3s,border-color .3s;}
+.promo:hover{transform:translateX(4px);border-color:rgba(94,242,192,.45);}
+.promo-pct{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.5rem;color:var(--green);flex-shrink:0;}
+.promo strong{color:var(--text);font-size:.95rem;}
+.promo small{color:var(--muted);font-size:.76rem;}
+.price-note{text-align:center;color:var(--muted);font-size:.82rem;margin-top:1.6rem;font-family:'Space Mono',monospace;}
+@media(max-width:680px){.price-wrap{grid-template-columns:1fr;}}
+
+/* ===== WHATSAPP FLOAT ===== */
+.wa-float{position:fixed;bottom:22px;right:22px;width:58px;height:58px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;font-size:1.7rem;text-decoration:none;box-shadow:0 6px 22px rgba(37,211,102,.55);z-index:200;transition:transform .2s;}
+.wa-float:hover{transform:scale(1.12);}
+
+/* ===== FOOTER ===== */
+footer{background:var(--bg2);border-top:1px solid var(--border);text-align:center;padding:2.5rem 1.5rem;position:relative;z-index:1;}
+footer img{width:80px;border-radius:50%;background:#fff;padding:5px;margin-bottom:.8rem;}
+footer .fbrand{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:var(--text);}
+footer .finfo{color:var(--muted);font-size:.85rem;margin-top:.6rem;line-height:1.8;}
+footer a{color:var(--accent);text-decoration:none;}
+
+@media(max-width:600px){section{padding:3rem 1.1rem;}.logo-img{width:135px;}}
+</style>
+</head>
+<body>
+
+<!-- BANDEAU ESSAI OFFERT -->
+<div class="topbar">🎁 1ᵉʳᵉ SÉANCE D'ESSAI OFFERTE — <strong>uniquement avant le 7 octobre</strong> · rentrée le 7 octobre &nbsp;<a href="#inscription">Je réserve ma séance →</a></div>
+
+<!-- HERO -->
+<header>
+  <div class="hero-grid"></div>
+  <img src="logo-neutre.png" alt="Les Petits Génies de la Robotique" class="logo-img"/>
+  <div class="badge-top">❄️ FORMATION D'HIVER · FRANCE · ROBOTIC ACADÉMIE</div>
+  <h1 class="brand">FORMATION D'HIVER ROBOTIQUE</h1>
+  <div class="brand-sub">LES PETITS GÉNIES DE LA ROBOTIQUE · FRANCE 🇫🇷</div>
+  <div class="brand-sub" style="color:var(--accent2);margin-top:.45rem;">📍 METZ &amp; THIONVILLE · 🏫 ROBOTIC ACADÉMIE</div>
+  <div class="hero-dates">📅 RENTRÉE LE 7 OCTOBRE · JUSQU'AU 30 JUIN</div>
+  <div class="hero-essai">🎁 1ᵉʳᵉ SÉANCE D'ESSAI OFFERTE — AVANT LE 7 OCTOBRE</div>
+  <p class="hero-tagline">Une séance par semaine pour progresser pas à pas — <strong>Scratch, Python, C, Arduino, ESP32</strong>, conception 3D — et <strong>son propre robot construit en fin d'année</strong> ❄️🤖</p>
+  <div class="hero-tags">
+    <span class="tag">🧱 LEGO PROGRAMMABLE</span>
+    <span class="tag">🖨️ CONCEPTION 3D</span>
+    <span class="tag">🔌 ARDUINO · MICRO:BIT · ESP32</span>
+    <span class="tag">💻 SCRATCH · PYTHON · C</span>
+    <span class="tag">🌐 IoT &amp; INTELLIGENCE ARTIFICIELLE</span>
+  </div>
+  <a href="#inscription" class="cta-hero">🚀 Inscrire mon enfant</a>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#infos">// Infos</a>
+    <a href="#parcours">// Parcours</a>
+    <a href="#creneaux">// Créneaux</a>
+    <a href="#annee">// Année</a>
+    <a href="#projets">// Projets</a>
+    <a href="#tarifs">// Tarifs</a>
+    <a href="#stages">// Stages vacances</a>
+    <a href="#inscription">// Inscription</a>
+  </div>
+</nav>
+
+<!-- QUICK INFO -->
+<section id="infos">
+  <div class="section-header">
+    <span class="section-label">// EN BREF</span>
+    <h2 class="section-title">La formation en un coup d'œil</h2>
+    <p class="section-sub">Un apprentissage suivi toute l'année scolaire, en petits groupes de niveau, avec un projet personnel à la clé.</p>
+  </div>
+  <div class="quick">
+    <div class="qcard"><div class="ic">📅</div><div class="t">7 OCT → 30 JUIN</div><div class="d">Rentrée le 7 octobre · hors vacances</div></div>
+    <div class="qcard"><div class="ic">⏰</div><div class="t">1 SÉANCE / SEMAINE</div><div class="d">1h (6–9 ans) · 1h30 (10 ans et +)</div></div>
+    <div class="qcard"><div class="ic">📍</div><div class="t">2 ADRESSES</div><div class="d">9, rue de Sablon, Metz<br>6, rue de la Tour, 57100 Thionville</div></div>
+    <div class="qcard"><div class="ic">👥</div><div class="t">PETITS GROUPES</div><div class="d">Par niveau et par âge</div></div>
+    <div class="qcard"><div class="ic">🤖</div><div class="t">UN ROBOT EN FIN D'ANNÉE</div><div class="d">Adapté à l'âge et au niveau</div></div>
+  </div>
+</section>
+
+<!-- PARCOURS -->
+<section id="parcours">
+  <div class="section-header">
+    <span class="section-label">// LES PARCOURS</span>
+    <h2 class="section-title">Choisissez le parcours de votre enfant</h2>
+    <p class="section-sub">Chaque parcours suit une progression annuelle : les bases en automne, la pratique en hiver, un vrai projet au printemps.</p>
+  </div>
+  <div class="cards">
+    <div class="card c3">
+      <span class="card-icon">🧩</span>
+      <div class="card-title">Scratch &amp; Lego programmable</div>
+      <p>La programmation visuelle par blocs pour démarrer en s'amusant : animations, jeux, puis machines Lego animées par moteurs et capteurs.</p>
+      <span class="lvl">DÈS 6 ANS · DÉBUTANT</span>
+    </div>
+    <div class="card c1">
+      <span class="card-icon">🐍</span>
+      <div class="card-title">Python</div>
+      <p>Le langage moderne et puissant : logique, jeux, scripts, traitement de données et première approche de l'intelligence artificielle.</p>
+      <span class="lvl">DÈS 10 ANS · INTERMÉDIAIRE</span>
+    </div>
+    <div class="card c2">
+      <span class="card-icon">💻</span>
+      <div class="card-title">Programmation C</div>
+      <p>Les bases solides du code, au plus près de l'électronique : variables, boucles, fonctions et pilotage des cartes programmables.</p>
+      <span class="lvl">DÈS 12 ANS · CONFIRMÉ</span>
+    </div>
+    <div class="card c2">
+      <span class="card-icon">⚡</span>
+      <div class="card-title">Électronique &amp; Arduino</div>
+      <p>Circuits, capteurs, LED, moteurs et alarmes : programmer de vrais montages avec <strong>Arduino</strong>, <strong>micro:bit</strong> et <strong>ESP32</strong>.</p>
+      <span class="lvl">TOUS NIVEAUX</span>
+    </div>
+    <div class="card c1">
+      <span class="card-icon">🖨️</span>
+      <div class="card-title">Conception 3D</div>
+      <p>Modéliser des pièces et des objets en 3D sur ordinateur comme un vrai designer, puis les intégrer à ses propres robots.</p>
+      <span class="lvl">TOUS NIVEAUX</span>
+    </div>
+    <div class="card c3">
+      <span class="card-icon">🌐</span>
+      <div class="card-title">Robotique, IoT &amp; IA</div>
+      <p>Construire et piloter des robots toute l'année, jusqu'au robot final. Les modules <strong>IoT</strong> et <strong>maison intelligente</strong> sont proposés en stage pendant les vacances.</p>
+      <span class="lvl">PARCOURS COMPLET</span>
+    </div>
+  </div>
+</section>
+
+<!-- CRÉNEAUX -->
+<section id="creneaux">
+  <div class="section-header">
+    <span class="section-label">// CRÉNEAUX HEBDOMADAIRES</span>
+    <h2 class="section-title">🗓️ Quand ont lieu les séances ?</h2>
+    <p class="section-sub">Une séance par semaine, au créneau de votre choix. Les horaires diffèrent selon la ville : <strong>Metz</strong> toute la semaine sauf le lundi, <strong>Thionville</strong> le dimanche matin uniquement.</p>
+  </div>
+  <div class="slot-choice">
+    <div class="slot-opt">👶 <strong>6 – 9 ANS</strong><span>séances de 1h</span></div>
+    <div class="slot-vs">·</div>
+    <div class="slot-opt">🧑 <strong>10 ANS ET +</strong><span>séances de 1h30</span></div>
+  </div>
+
+  <h3 class="city-head">📍 METZ — 9, rue de Sablon<br><small>toute la semaine sauf le lundi</small></h3>
+  <div class="sched-wrap">
+    <table>
+      <thead>
+        <tr><th>Début</th><th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="slot">9h00</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 9h00–10h00</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 9h00–10h00</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">10h00</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 10h00–11h00</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 10h00–11h00</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">11h00</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 11h00–12h00</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 11h00–12h00</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">13h30</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 13h30–15h00</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 13h30–15h00</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">15h00</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 15h00–16h30</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 15h00–16h30</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">16h30</td>
+          <td class="closed">Fermé</td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 16h30–17h30</b></span></td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 16h30–18h00</b></span></td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 16h30–17h30</b></span></td>
+          <td><span class="pill p1">👶 6–9 ans<b>1h · 16h30–17h30</b></span></td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 16h30–18h00</b></span></td>
+        </tr>
+        <tr>
+          <td class="slot">17h30</td>
+          <td class="closed">Fermé</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 17h30–19h00</b></span></td>
+          <td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 17h30–19h00</b></span></td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 17h30–19h00</b></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="slot">18h00</td>
+          <td class="closed">Fermé</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 18h00–19h30</b></span></td>
+          <td>—</td><td>—</td>
+          <td><span class="pill p2">🧑 10 ans et +<b>1h30 · 18h00–19h30</b></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="price-note">🗓️ Mercredi &amp; samedi : journée complète (matin séances de 1h, après-midi séances de 1h30) &nbsp;·&nbsp; Mardi, jeudi &amp; vendredi : après l'école, 16h30 et 17h30 &nbsp;·&nbsp; ❌ Fermé le lundi</p>
+
+  <h3 class="city-head">📍 THIONVILLE — 6, rue de la Tour, 57100 Thionville<br><small>dimanche matin uniquement</small></h3>
+  <div class="sched-wrap">
+    <table>
+      <thead>
+        <tr><th>Créneau</th><th>Dimanche</th><th>Durée</th><th>Âges</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="slot">9h00 – 10h30</td><td><span class="pill p3">❄️ Séance 1</span></td><td>1h30</td><td>Tous âges</td></tr>
+        <tr><td class="slot">10h30 – 12h00</td><td><span class="pill p3">❄️ Séance 2</span></td><td>1h30</td><td>Tous âges</td></tr>
+        <tr><td class="slot">12h00 – 13h30</td><td><span class="pill p3">❄️ Séance 3</span></td><td>1h30</td><td>Tous âges</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="price-note">💡 Les groupes sont constitués selon l'âge, le niveau et les disponibilités de chacun.</p>
+</section>
+
+<!-- PROGRAMME DE L'ANNÉE -->
+<section id="annee">
+  <div class="section-header">
+    <span class="section-label">// PROGRESSION ANNUELLE</span>
+    <h2 class="section-title">❄️ Le programme du 7 octobre au 30 juin</h2>
+    <p class="section-sub">Trois trimestres, une progression claire : on découvre, on maîtrise, on crée. Chaque niveau termine l'année par la construction de <strong>son propre robot</strong>, adapté à l'âge et au niveau.</p>
+  </div>
+  <div class="sched-wrap">
+    <table>
+      <thead>
+        <tr><th>Période</th><th>🍂 Trimestre 1<br>Octobre → Décembre</th><th>❄️ Trimestre 2<br>Janvier → Mars</th><th>🤖 Trimestre 3<br>Avril → Juin<br><small>PROJET ROBOT</small></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="slot">Débutants<br>6–9 ans</td>
+          <td><span class="pill p1">🧩 Bases de Scratch</span></td>
+          <td><span class="pill p1">🧱 Lego programmable</span></td>
+          <td><span class="pill p1">🤖 Robot Lego programmé</span></td>
+        </tr>
+        <tr>
+          <td class="slot">Intermédiaires<br>10–12 ans</td>
+          <td><span class="pill p2">⚡ Électronique &amp; capteurs</span></td>
+          <td><span class="pill p2">🔌 Arduino &amp; micro:bit</span></td>
+          <td><span class="pill p2">🤖 Robot suiveur de ligne / évite-obstacles</span></td>
+        </tr>
+        <tr>
+          <td class="slot">Confirmés<br>13–17 ans</td>
+          <td><span class="pill p3">🐍 Python / C</span></td>
+          <td><span class="pill p3">📡 ESP32 &amp; objets connectés</span></td>
+          <td><span class="pill p3">🤖 Robot connecté piloté à distance</span></td>
+        </tr>
+        <tr>
+          <td class="slot">Pendant les vacances</td>
+          <td colspan="3" class="pause">🌐 IoT &amp; 🏠 Maison intelligente — stages intensifs pendant les vacances scolaires</td>
+        </tr>
+        <tr>
+          <td class="slot">Transversal</td>
+          <td colspan="3" class="pause">🖨️ Conception 3D intégrée toute l'année &nbsp;·&nbsp; 🏆 Concours interne au printemps &nbsp;·&nbsp; 🎓 Remise des diplômes fin juin</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PROJETS -->
+<section id="projets">
+  <div class="finale">
+    <div class="big">🤖🏆</div>
+    <h2>Un robot construit par chaque enfant en fin d'année</h2>
+    <p>Toute l'année mène à un objectif concret : <strong>chaque niveau réalise son propre robot</strong>, choisi selon l'âge et le niveau de l'enfant. Du robot Lego programmé pour les plus jeunes au robot connecté piloté à distance pour les confirmés, votre enfant repart avec un projet qu'il a conçu, programmé et présenté lui-même. Un véritable avant-goût du métier d'ingénieur !</p>
+    <div class="proj-chips">
+      <span>🧱 Robot Lego · 6–9 ans</span><span>🚗 Robot suiveur de ligne · 10–12 ans</span><span>📡 Robot connecté ESP32 · 13–17 ans</span>
+      <span>🔌 Arduino</span><span>🟩 micro:bit</span><span>🖨️ Pièces imprimées en 3D</span>
+    </div>
+    <div class="badge">🎓 En juin : présentation du robot &amp; remise des diplômes !</div>
+  </div>
+  <div class="section-header" style="margin-top:3.5rem;">
+    <span class="section-label">// PENDANT LES VACANCES</span>
+    <h2 class="section-title">🏠 IoT &amp; Maison intelligente</h2>
+    <p class="section-sub">Les modules <strong>objets connectés (IoT)</strong> et <strong>maison intelligente</strong> sont proposés pendant les vacances scolaires, en stage intensif : lumières pilotées, capteurs, alarme connectée et pilotage depuis le téléphone.</p>
+  </div>
+  <div class="proj-chips">
+    <span>🏠 Maison intelligente</span><span>💡 Éclairage automatique</span><span>🌡️ Capteurs température &amp; humidité</span>
+    <span>🔔 Alarme connectée</span><span>📱 Pilotage par smartphone</span><span>🌐 Objets connectés (IoT)</span>
+  </div>
+</section>
+
+<!-- TARIFS -->
+<section id="tarifs">
+  <div class="section-header">
+    <span class="section-label">// TARIFS</span>
+    <h2 class="section-title">💶 Tarif &amp; réductions</h2>
+    <p class="section-sub">Un tarif à la séance, payable au mois ou au trimestre — encadrement, matériel et projets inclus.</p>
+  </div>
+  <div class="price-wrap">
+    <div class="price-main">
+      <div class="price-label">FORMATION ANNUELLE</div>
+      <div class="price-amount price-text">Prix très<br>compétitif 🎯</div>
+      <div class="price-per">/ enfant · paiement mensuel ou trimestriel</div>
+      <ul class="price-incl">
+        <li>✅ 1 séance / semaine — 1h (6–9 ans) ou 1h30 (10 ans et +)</li>
+        <li>✅ Parcours au choix : Scratch, Python, C, 3D, Arduino</li>
+        <li>✅ Tout le matériel fourni (cartes, capteurs, Lego)</li>
+        <li>✅ Suivi personnalisé &amp; petits groupes de niveau</li>
+        <li>✅ Un robot construit en fin d'année + diplôme</li>
+      </ul>
+    </div>
+    <div class="price-promos">
+      <div class="promo"><span class="promo-pct">-10%</span><div><strong>Premiers inscrits</strong><br><small>Pour les premières inscriptions de la saison</small></div></div>
+      <div class="promo"><span class="promo-pct">-10%</span><div><strong>2ᵉ enfant</strong><br><small>Réduction supplémentaire pour un 2ᵉ enfant de la famille</small></div></div>
+      <div class="promo"><span class="promo-pct">-5%</span><div><strong>Paiement à l'année</strong><br><small>Pour un règlement de la saison complète à l'avance</small></div></div>
+      <div class="promo"><span class="promo-pct">🎁</span><div><strong>1ʳᵉ séance d'essai offerte</strong><br><small>Pour découvrir l'atelier sans engagement — <strong>uniquement avant le 7 octobre</strong></small></div></div>
+    </div>
+  </div>
+  <p class="price-note">💡 Nos tarifs sont très compétitifs — le montant exact et les réductions vous sont communiqués lors de votre inscription.</p>
+</section>
+
+<!-- STAGES VACANCES -->
+<section id="stages">
+  <div class="section-header">
+    <span class="section-label">// EN OPTION · PENDANT LES VACANCES</span>
+    <h2 class="section-title">🎿 Stages intensifs des vacances scolaires</h2>
+    <p class="section-sub">En complément de la formation annuelle, votre enfant peut suivre un stage intensif d'une semaine pendant les vacances (Toussaint, Noël, février, printemps) — c'est aussi pendant ces stages que sont abordés l'<strong>IoT</strong> et la <strong>maison intelligente</strong>.</p>
+  </div>
+  <div class="slot-choice">
+    <div class="slot-opt">📘 <strong>Stage DÉCOUVERTE</strong><span>15h / semaine</span></div>
+    <div class="slot-vs">ou</div>
+    <div class="slot-opt">📗 <strong>Stage INTENSIF</strong><span>30h / semaine</span></div>
+  </div>
+  <p class="price-note">💡 Programme et planning adaptés à chaque enfant — détails et tarif communiqués à l'inscription.</p>
+</section>
+
+<!-- FORM -->
+<section id="inscription" class="form-sec" style="max-width:none;">
+  <div style="max-width:1100px;margin:0 auto;">
+  <div class="section-header">
+    <span class="section-label">// RÉSERVATION</span>
+    <h2 class="section-title">📝 Inscription à la formation</h2>
+    <p class="section-sub">Places limitées ! Réservez la place de votre enfant en quelques secondes.</p>
+  </div>
+  <form id="inscForm" onsubmit="return sendInscription(event);">
+    <div class="row">
+      <div class="field"><label>Prénom de l'enfant <span class="req">*</span></label><input id="f_prenom" type="text" required placeholder="Prénom"></div>
+      <div class="field"><label>Nom de l'enfant <span class="req">*</span></label><input id="f_nom" type="text" required placeholder="Nom"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Ville de la formation <span class="req">*</span></label>
+        <select id="f_ville" aria-label="Ville de la formation" required onchange="majCreneaux()"><option value="">— Choisir —</option>
+          <option>Metz — 9 rue de Sablon</option>
+          <option>Thionville — 6, rue de la Tour (dimanche matin)</option>
+        </select>
+      </div>
+      <div class="field"><label>Âge <span class="req">*</span></label>
+        <select id="f_age" aria-label="Âge de l'enfant" required><option value="">— Choisir —</option>
+          <option>6 ans</option><option>7 ans</option><option>8 ans</option><option>9 ans</option><option>10 ans</option>
+          <option>11 ans</option><option>12 ans</option><option>13 ans</option><option>14 ans</option>
+          <option>15 ans</option><option>16 ans</option><option>17 ans</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Parcours souhaité <span class="req">*</span></label>
+        <select id="f_parcours" aria-label="Parcours souhaité" required><option value="">— Choisir —</option>
+          <option>🧩 Scratch &amp; Lego programmable</option>
+          <option>🐍 Python</option>
+          <option>💻 Programmation C</option>
+          <option>⚡ Électronique &amp; Arduino</option>
+          <option>🖨️ Conception 3D</option>
+          <option>🤖 Robotique, IoT &amp; IA</option>
+          <option>❓ À conseiller selon son niveau</option>
+        </select>
+      </div>
+      <div class="field"><label>Formule <span class="req">*</span></label>
+        <select id="f_formule" aria-label="Formule" required><option value="">— Choisir —</option>
+          <option>Formation annuelle — 1 séance / semaine (1h ou 1h30 selon l'âge)</option>
+          <option>Formation annuelle intensive — 2 séances / semaine</option>
+          <option>Stage vacances — 15h / semaine</option>
+          <option>Stage vacances — 30h / semaine</option>
+          <option>🎁 Séance d'essai offerte (avant le 7 octobre)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Créneau souhaité <span class="req">*</span></label>
+        <select id="f_creneau" aria-label="Créneau souhaité" required disabled><option value="">— Choisissez d'abord la ville —</option></select>
+        <p class="hint" id="creneau_hint">👶 6–9 ans : séances de 1h &nbsp;·&nbsp; 🧑 10 ans et + : séances de 1h30</p>
+      </div>
+    </div>
+    <div class="field"><label>A-t-il déjà des connaissances en robotique ? <span class="req">*</span></label>
+      <select id="f_niveau" aria-label="Connaissances en robotique" required><option value="">— Choisir —</option>
+        <option>Débutant — aucune connaissance</option>
+        <option>Quelques notions</option>
+        <option>Intermédiaire — a déjà pratiqué</option>
+        <option>Confirmé — bonne expérience</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="field"><label>Nom du parent / tuteur <span class="req">*</span></label><input id="f_parent" type="text" required placeholder="Votre nom"></div>
+      <div class="field"><label>Téléphone / WhatsApp <span class="req">*</span></label><input id="f_tel" type="tel" required placeholder="Ex : 06 12 34 56 78"></div>
+    </div>
+    <div class="field"><label>Adresse e-mail <span class="req">*</span></label><input id="f_email" type="email" required placeholder="exemple@email.com"></div>
+    <div class="field"><label>Allergies / infos médicales (optionnel)</label><textarea id="f_med" rows="3" placeholder="Toute information utile pour l'équipe encadrante"></textarea></div>
+    <!-- Piège anti-robot : invisible pour les visiteurs, seuls les robots le remplissent -->
+    <div class="hp" aria-hidden="true">
+      <label for="f_site">Ne pas remplir ce champ</label>
+      <input id="f_site" type="text" name="site" tabindex="-1" autocomplete="off">
+    </div>
+    <button type="submit" class="submit submit-full" id="btnSubmit">✅ Inscrire mon enfant</button>
+    <p class="note">// Inscription en 1 clic — rien d'autre à faire. Vous recevez aussitôt un e-mail de confirmation et l'académie est prévenue automatiquement.</p>
+    <p class="note">Une question avant d'inscrire ? <a class="walink" href="https://wa.me/33751210100" target="_blank" rel="noopener">💬 Écrivez-nous sur WhatsApp</a></p>
+  </form>
+  <div id="ok">✅ Inscription bien enregistrée !</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <img src="logo-neutre.png" alt="Logo"/>
+  <div class="fbrand">Les Petits Génies de la Robotique · France 🇫🇷</div>
+  <div class="finfo">
+    📍 9, rue de Sablon, Metz &nbsp;·&nbsp; 📍 6, rue de la Tour, 57100 Thionville &nbsp;·&nbsp; 🏫 Robotic Académie<br>
+    ☎️ Tél : <a href="tel:+33751210100">07 51 21 01 00</a> &nbsp;·&nbsp; 📱 WhatsApp : <a href="https://wa.me/33751210100">07 51 21 01 00</a> &nbsp;·&nbsp; ✉️ <a href="mailto:robotics.academy.contact@gmail.com">robotics.academy.contact@gmail.com</a><br>
+    ⭐ 10 ans d'expérience &nbsp;·&nbsp; ❄️ Formation d'hiver Robotique · du 7 octobre au 30 juin
+  </div>
+</footer>
+
+<!-- Bouton WhatsApp flottant -->
+<a class="wa-float" href="https://wa.me/33751210100?text=Bonjour%20Robotic%20Acad%C3%A9mie%20France%2C%20je%20souhaite%20des%20informations%20sur%20la%20Formation%20d%27hiver%20Robotique." target="_blank" rel="noopener" title="Nous contacter sur WhatsApp">💬</a>
+
+<script>
+// Adresse e-mail de réception des inscriptions :
+var ACADEMY_EMAIL = "robotics.academy.contact@gmail.com";
+
+function v(id){return document.getElementById(id).value.trim();}
+function med(){return v('f_med')||'—';}
+
+/* ===== Créneaux disponibles selon la ville ===== */
+var CRENEAUX_METZ = [
+  "🌤️ Mercredi — 9h00 à 10h00 (1h · 6–9 ans)",
+  "🌤️ Mercredi — 10h00 à 11h00 (1h · 6–9 ans)",
+  "🌤️ Mercredi — 11h00 à 12h00 (1h · 6–9 ans)",
+  "🌥️ Mercredi — 13h30 à 15h00 (1h30 · 10 ans et +)",
+  "🌥️ Mercredi — 15h00 à 16h30 (1h30 · 10 ans et +)",
+  "🌥️ Mercredi — 16h30 à 18h00 (1h30 · 10 ans et +)",
+  "🌙 Mercredi — 18h00 à 19h30 (1h30 · 10 ans et +)",
+  "❄️ Samedi — 9h00 à 10h00 (1h · 6–9 ans)",
+  "❄️ Samedi — 10h00 à 11h00 (1h · 6–9 ans)",
+  "❄️ Samedi — 11h00 à 12h00 (1h · 6–9 ans)",
+  "🌨️ Samedi — 13h30 à 15h00 (1h30 · 10 ans et +)",
+  "🌨️ Samedi — 15h00 à 16h30 (1h30 · 10 ans et +)",
+  "🌨️ Samedi — 16h30 à 18h00 (1h30 · 10 ans et +)",
+  "🌙 Samedi — 18h00 à 19h30 (1h30 · 10 ans et +)",
+  "📕 Mardi — 16h30 à 17h30 (1h · 6–9 ans)",
+  "📕 Mardi — 17h30 à 19h00 (1h30 · 10 ans et +)",
+  "📗 Jeudi — 16h30 à 17h30 (1h · 6–9 ans)",
+  "📗 Jeudi — 17h30 à 19h00 (1h30 · 10 ans et +)",
+  "📘 Vendredi — 16h30 à 17h30 (1h · 6–9 ans)",
+  "📘 Vendredi — 17h30 à 19h00 (1h30 · 10 ans et +)",
+  "🔄 Flexible / à définir ensemble"
+];
+var CRENEAUX_THIONVILLE = [
+  "❄️ Dimanche — 9h00 à 10h30 (1h30)",
+  "❄️ Dimanche — 10h30 à 12h00 (1h30)",
+  "❄️ Dimanche — 12h00 à 13h30 (1h30)",
+  "🔄 Flexible / à définir ensemble"
+];
+
+function majCreneaux(){
+  var ville=document.getElementById('f_ville').value;
+  var sel=document.getElementById('f_creneau');
+  var hint=document.getElementById('creneau_hint');
+  sel.innerHTML='';
+  if(!ville){
+    sel.disabled=true;
+    sel.appendChild(new Option("— Choisissez d'abord la ville —",""));
+    hint.textContent="👶 6–9 ans : séances de 1h · 🧑 10 ans et + : séances de 1h30";
+    return;
+  }
+  var liste = (ville.indexOf('Thionville')===0) ? CRENEAUX_THIONVILLE : CRENEAUX_METZ;
+  sel.disabled=false;
+  sel.appendChild(new Option("— Choisir —",""));
+  for(var i=0;i<liste.length;i++){ sel.appendChild(new Option(liste[i],liste[i])); }
+  hint.textContent = (ville.indexOf('Thionville')===0)
+    ? "❄️ Thionville — 6, rue de la Tour, 57100 Thionville : le dimanche matin uniquement, de 9h00 à 13h30 (séances de 1h30)."
+    : "🗓️ Metz — 9, rue de Sablon : fermé le lundi · mercredi & samedi toute la journée · mardi, jeudi & vendredi après l'école (16h30 et 17h30).";
+}
+document.addEventListener('DOMContentLoaded',majCreneaux);
+
+
+/* =========================================================
+   ENVOI DE L'INSCRIPTION
+   1) Google Apps Script  -> ajoute la ligne dans le Google Sheet
+                             (onglet par jour + onglet "TOUTES")
+                             + e-mail a l'academie + e-mail au parent
+   2) FormSubmit (secours) -> e-mail a l'academie + e-mail au parent
+   ========================================================= */
+
+// Clé partagée avec le script Google : bloque les envois qui ne viennent pas de ce site
+var CLE_SITE = "LPG-hiver-2026-Metz-Thionville";
+// Heure d'ouverture de la page : un robot valide le formulaire en moins de 5 secondes
+var T_OUVERTURE = Date.now();
+
+// >>> COLLER ICI l'URL de votre application web Google Apps Script (voir INSTRUCTIONS.md)
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWXp1jkKPm3QciEXwpYRTsxoGYqVV5ifJ8SPZDfCc-ka9Wv3nu8LBziBs5MXJ1y9w-/exec";
+
+function confirmOk(msg,isErr){
+  var ok=document.getElementById('ok');
+  if(msg) ok.innerHTML=msg;
+  ok.className = isErr ? 'err' : '';
+  ok.style.display='block';
+  ok.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function collecte(){
+  return {
+    Enfant: (v('f_prenom')+" "+v('f_nom')).trim(),
+    Prenom: v('f_prenom'),
+    Nom: v('f_nom'),
+    Age: v('f_age'),
+    Ville: v('f_ville'),
+    Parcours: v('f_parcours'),
+    Formule: v('f_formule'),
+    Creneau: v('f_creneau'),
+    Niveau: v('f_niveau'),
+    Parent: v('f_parent'),
+    Telephone: v('f_tel'),
+    Email: v('f_email'),
+    Infos_medicales: med(),
+    Cle: CLE_SITE,
+    Piege: v('f_site'),
+    Duree: Math.round((Date.now()-T_OUVERTURE)/1000),
+    Origine: location.hostname || "local"
+  };
+}
+
+function btnLoading(on){
+  var b=document.getElementById('btnSubmit');
+  b.disabled=on;
+  b.textContent = on ? "⏳ Envoi en cours…" : "✅ Inscrire mon enfant";
+}
+
+function succes(d){
+  var form=document.getElementById('inscForm');
+  btnLoading(false);
+  confirmOk("✅ <span style='font-size:1.1rem'>Inscription enregistrée !</span><br>"
+    +"Un e-mail de confirmation vient d'être envoyé à <strong>"+d.Email+"</strong> (pensez à vérifier vos spams).<br>"
+    +"L'académie a bien reçu la demande pour <strong>"+d.Enfant+"</strong> — créneau : "+d.Creneau+".<br>"
+    +"Nous vous recontactons très vite pour confirmer le groupe et le tarif. 🤖");
+  form.reset();
+  majCreneaux();
+}
+
+function echec(){
+  btnLoading(false);
+  confirmOk("⚠️ L'envoi automatique n'a pas fonctionné.<br>"
+    +"Merci de nous contacter directement : <a href='tel:+33751210100'>07 51 21 01 00</a> "
+    +"· <a href='https://wa.me/33751210100' target='_blank' rel='noopener'>WhatsApp</a> "
+    +"· <a href='mailto:"+ACADEMY_EMAIL+"'>"+ACADEMY_EMAIL+"</a>", true);
+}
+
+/* Secours : FormSubmit (e-mails uniquement, pas de liste) */
+function envoiFormSubmit(d){
+  var auto="Bonjour "+d.Parent+",\n\n"
+    +"Merci ! Nous confirmons la reception de l'inscription de "+d.Enfant+" ("+d.Age+") a la Formation d'hiver Robotique - Les Petits Genies de la Robotique (rentree le 7 octobre, jusqu'au 30 juin).\n\n"
+    +"VILLE : "+d.Ville+"\n"
+    +"PARCOURS : "+d.Parcours+"\n"
+    +"FORMULE : "+d.Formule+"\n"
+    +"CRENEAU : "+d.Creneau+"\n"
+    +"\nNous vous recontacterons tres vite pour confirmer le groupe et vous communiquer le tarif.\n"
+    +"WhatsApp / Tel : 07 51 21 01 00\n"
+    +"Adresses : 9, rue de Sablon, Metz | 6, rue de la Tour, 57100 Thionville\n\n"
+    +"A bientot !\nLes Petits Genies de la Robotique";
+  var data={
+    _subject:"Nouvelle inscription — "+d.Enfant+" — "+d.Creneau,
+    _template:"table",
+    _autoresponse:auto,
+    _captcha:"false",
+    Enfant:d.Enfant, Age:d.Age, Ville:d.Ville, Parcours:d.Parcours, Formule:d.Formule,
+    Creneau:d.Creneau, Niveau:d.Niveau, Parent:d.Parent, Telephone:d.Telephone,
+    email:d.Email, Infos_medicales:d.Infos_medicales
+  };
+  fetch("https://formsubmit.co/ajax/"+ACADEMY_EMAIL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json"},
+    body:JSON.stringify(data)
+  }).then(function(r){return r.json();}).then(function(r){
+    if(r && (r.success===true||r.success==="true")){ succes(d); } else { echec(); }
+  }).catch(echec);
+}
+
+/* Envoi principal : Google Apps Script (liste + e-mails) */
+function sendInscription(e){
+  e.preventDefault();
+  var form=document.getElementById('inscForm');
+  if(!form.checkValidity()){form.reportValidity();return false;}
+  var d=collecte();
+  btnLoading(true);
+  confirmOk("📨 Envoi de votre inscription…");
+
+  if(!SCRIPT_URL){ envoiFormSubmit(d); return false; }
+
+  var body=new URLSearchParams();
+  for(var k in d){ if(d.hasOwnProperty(k)) body.append(k,d[k]); }
+
+  fetch(SCRIPT_URL,{method:"POST",body:body})
+    .then(function(r){return r.json();})
+    .then(function(r){
+      if(r && r.ok){ succes(d); }
+      else if(r && r.refus){ refus(r.refus); }   // filtre anti-robot : pas de repli
+      else { envoiFormSubmit(d); }
+    })
+    .catch(function(){ envoiFormSubmit(d); });
+  return false;
+}
+
+/* Message affiché quand le filtre anti-robot bloque l'envoi */
+function refus(motif){
+  btnLoading(false);
+  var m = {
+    trop_rapide : "Le formulaire a été validé trop vite. Prenez le temps de le remplir puis réessayez.",
+    doublon     : "Cette inscription a déjà été enregistrée il y a quelques instants — inutile de recommencer.",
+    trop_essais : "Trop d'inscriptions envoyées depuis cette adresse e-mail. Réessayez dans une heure ou appelez-nous.",
+    email       : "L'adresse e-mail saisie ne semble pas valide.",
+    telephone   : "Le numéro de téléphone saisi ne semble pas valide.",
+    incomplet   : "Il manque une information dans le formulaire."
+  }[motif] || "L'inscription n'a pas pu être validée.";
+  confirmOk("⚠️ "+m+"<br>Besoin d'aide ? <a href='tel:+33751210100'>07 51 21 01 00</a> "
+    +"· <a href='https://wa.me/33751210100' target='_blank' rel='noopener'>WhatsApp</a>", true);
+}
+</script>
+
+</body>
+</html>
