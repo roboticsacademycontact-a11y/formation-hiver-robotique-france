@@ -31,20 +31,32 @@ Durée : environ 10 minutes, une seule fois. Tout est gratuit.
 ## Étape 3 — Vérifier que le script voit bien le classeur
 
 Dans l'éditeur Apps Script, choisissez la fonction **`verifierInstallation`** puis **Exécuter**.
-Le journal doit afficher `OK` pour chacun des onglets :
+Le journal doit se terminer par `=> Tout est bon.` :
 
 ```
 Classeur : Prospects Essai gratuit Robotique 2026-2027 - Metz et Thionville
-OK   INSCRIPTIONS
-OK   SUIVI Metz
-OK   SUIVI Thionville
-OK   Parametres
-OK   Tarifs
-Remise appliquée aujourd'hui : 10 %
+OK     INSCRIPTIONS
+OK     SUIVI Metz
+OK     SUIVI Thionville
+OK     Parametres
+OK     Tarifs
+OK     écriture autorisée
+Tarif 10 ans : 800 € · remise 10 % · net 720 €
+Date limite remise : 30/09/2026  (le site annonce 15/09/2026)
+=> Tout est bon.
 ```
 
-Un `MANQUE` signale un onglet renommé : corrigez le nom en haut de **code.gs**
-(`ONGLET_INSCRIPTIONS`, `ONGLET_SUIVI`, …).
+- `MANQUE` signale un onglet renommé : corrigez le nom en haut de **code.gs**
+  (`ONGLET_INSCRIPTIONS`, `ONGLET_SUIVI`, …). Les différences de casse et d'accents
+  sont déjà gérées : `Paramètres` et `Parametres` sont reconnus comme le même onglet.
+- `ÉCHEC Classeur inaccessible` ou `écriture refusée` : voir « En cas d'erreur d'autorisation ».
+
+## Étape 3 bis — Essai à blanc (recommandé)
+
+Toujours dans l'éditeur, exécutez **`testerInscription`**. Le script écrit une vraie
+inscription de test dans les onglets, affiche les deux lignes produites dans le journal,
+**puis les efface**. Aucun e-mail n'est envoyé. C'est la façon la plus sûre de vérifier
+que les colonnes tombent au bon endroit avant d'ouvrir le formulaire au public.
 
 ## Étape 4 — Déployer
 
@@ -102,14 +114,30 @@ Doublon ? · Appelé le · Joignable ? · Essai prévu le · Venu ? · Inscrit ?
 - **Doublon ?** passe à `Doublon` si le téléphone ou l'e-mail existe déjà dans l'onglet
   (les numéros `+33…` et `0…` sont reconnus comme identiques).
 - **Inscrit ?** passe à `Inscrit`, sauf pour une séance d'essai — qui reste un prospect à suivre.
+- Si la ville n'est reconnue ni comme Metz ni comme Thionville, la ligne part dans l'onglet
+  `SUIVI` général s'il existe, plutôt que d'être perdue.
 
 Le script repère les colonnes **par leur titre**, pas par leur position : vous pouvez déplacer
 ou insérer une colonne sans rien casser. Ne renommez simplement pas les en-têtes.
 
-## Changer la date limite de la remise
+## La date limite de la remise
 
-Modifiez la ligne **Date limite remise** de l'onglet **Parametres** (format `JJ/MM/AAAA`),
-ou exécutez la fonction **`corrigerDateLimiteRemise`** dans l'éditeur Apps Script.
+À la **première inscription** reçue après l'installation, le script aligne tout seul la ligne
+**Date limite remise** de l'onglet `Parametres` sur la date annoncée par le site
+(constante `DATE_LIMITE_REMISE` en haut de **code.gs**, actuellement `15/09/2026`).
+
+Il ne le fait **qu'une seule fois** : si vous modifiez cette date à la main ensuite,
+le script la respecte et n'y touche plus. Pour forcer l'alignement, exécutez
+**`corrigerDateLimiteRemise`** dans l'éditeur.
+
+Passé cette date, la remise tombe automatiquement à 0 % et `Net a payer` vaut le tarif plein.
+
+## Si une inscription n'arrive pas dans le classeur
+
+Le script ne perd jamais une inscription. Si le classeur est inaccessible au moment de
+l'envoi, l'académie reçoit un e-mail **« ⚠️ Inscription NON enregistrée »** contenant toutes
+les informations du formulaire, à recopier à la main ; le site, de son côté, bascule sur
+FormSubmit et le parent reçoit quand même sa confirmation.
 
 ## En cas d'erreur d'autorisation
 
