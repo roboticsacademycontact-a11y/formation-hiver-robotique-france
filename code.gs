@@ -2,33 +2,31 @@
  * FORMATION ROBOTIQUE — Les Petits Génies de la Robotique
  * Réception des inscriptions du site.
  *
- * Toutes les inscriptions arrivent dans le classeur
- *   « Prospects Essai gratuit Robotique 2026-2027 - Metz et Thionville »
- * et nulle part ailleurs :
- *
- *   1. onglet INSCRIPTIONS    -> la fiche complète (avec tarif, remise, net à payer)
- *   2. onglet SUIVI Metz      -> la ligne de suivi téléphonique, selon la ville
- *      ou  SUIVI Thionville
+ * À chaque inscription :
+ *   1. classeur « Inscriptions Formation Robotique » :
+ *      onglet TOUTES LES INSCRIPTIONS + onglet du jour (trié par heure)
+ *      -> c'est la source que lit le Centre de gestion (onglet INSCRITS,
+ *         tarif, remise, échéances : calculés par le Centre de gestion)
+ *   2. classeur « Prospects Essai gratuit Robotique 2026-2027 » :
+ *      onglet SUIVI Metz ou SUIVI Thionville, selon la ville (Source = Site)
  *   3. e-mail à l'académie + e-mail de confirmation au parent
+ *   Si une écriture échoue : e-mail « ⚠️ Inscription NON enregistrée ».
  *
  * Installation : voir INSTRUCTIONS.md
  */
 
-/* ---------- Classeur de destination ----------
-   « Prospects Essai gratuit Robotique 2026-2027 - Metz et Thionville ».
-   Pour changer de classeur, remplacez cet identifiant (il se lit dans
-   l'adresse du classeur, entre /d/ et /edit).                              */
-var ID_CLASSEUR = "1yWPFFU_OKvMv0KMPFKUHixbMJLWMzTV5wT2jRZBes8s";
+/* ---------- Classeurs de destination ----------
+   L'identifiant se lit dans l'adresse du classeur, entre /d/ et /edit.     */
+var ID_CLASSEUR     = "1yWPFFU_OKvMv0KMPFKUHixbMJLWMzTV5wT2jRZBes8s";   // Prospects (SUIVI)
+var ID_INSCRIPTIONS = "16RhXc1AvmCUahgQvdflPor4ajMcx9k9XhxohIFItV-Y";   // Inscriptions Formation Robotique
 
 var EMAIL_ACADEMIE = "robotics.academy.contact@gmail.com";
 var TEL_ACADEMIE   = "07 51 21 01 00";
 
 /* ---------- Noms des onglets (tels qu'ils existent déjà dans le classeur) ---------- */
-var ONGLET_INSCRIPTIONS = "INSCRIPTIONS";
+var ONGLET_TOUTES       = "TOUTES LES INSCRIPTIONS";   // lu par le Centre de gestion
 var ONGLET_SUIVI        = { "Metz": "SUIVI Metz", "Thionville": "SUIVI Thionville" };
 var ONGLET_SUIVI_DEFAUT = "SUIVI";      // repli si la ville n'est pas reconnue
-var ONGLET_PARAMETRES   = "Parametres";
-var ONGLET_TARIFS       = "Tarifs";
 var ONGLET_BLOQUEES     = "TENTATIVES BLOQUEES";
 
 /* ---------- Protection anti-robot ---------- */
@@ -37,17 +35,10 @@ var DUREE_MINIMUM   = 5;    // secondes : en dessous, c'est un robot
 var MAX_PAR_EMAIL   = 3;    // inscriptions autorisées par e-mail et par heure
 var MAX_PAR_HEURE   = 30;   // inscriptions autorisées au total par heure
 
-/* ---------- Date limite de la remise de rentrée ----------
-   Celle annoncée par le site. Au tout premier envoi suivant l'installation,
-   le script aligne la ligne « Date limite remise » de l'onglet Parametres
-   sur cette valeur, puis ne la touche plus jamais : vous restez libre de la
-   modifier ensuite à la main.                                              */
-var DATE_LIMITE_REMISE = "15/09/2026";
-
 /* ---------- En-têtes attendus (ordre des colonnes des onglets existants) ---------- */
-var ENTETES_INSCRIPTIONS = ["Cle","Date inscription","Annee","Enfant","Age","Ville","Lieu",
-  "Jour","Heure","Creneau complet","Parcours","Formule","Niveau","Parent","Telephone",
-  "E-mail","Tarif base","Remise","Net a payer","Origine","Notes"];
+/* Ordre IMPOSÉ : le Centre de gestion lit ces colonnes par position (A à N). */
+var ENTETES_TOUTES = ["Date d'inscription","Enfant","Âge","Ville","Jour","Heure","Créneau complet",
+  "Parcours","Formule","Niveau","Parent / tuteur","Téléphone","E-mail","Infos médicales"];
 
 var ENTETES_SUIVI = ["Date","Nom complet","Téléphone","Ville","Âge","Âge exact",
   "Créneau souhaité","Source","Doublon ?","Appelé le","Joignable ?","Essai prévu le",
@@ -68,21 +59,20 @@ function doPost(e) {
     if (verdict.silence) { return reponse({ ok: true }); }   // robot : on fait semblant d'accepter
     if (verdict.refus)   { return reponse({ ok: false, refus: verdict.refus }); }
 
-    var ss = classeur();
-    alignementInitial(ss);
+    var ss  = classeur();
+    var ins = classeurInscriptions();
 
     /* --- 2. Mise en forme des informations --- */
     var lieu  = extraitLieu(p.Ville);
     var jour  = extraitJour(p.Creneau);
     var heure = extraitHeure(p.Creneau);
-    var tarif = calculeTarif(ss, p.Age);
 
     /* --- 3. Écriture dans les onglets --- */
-    ecritInscription(ss, p, lieu, jour, heure, tarif);
+    ecritToutes(ins, p, jour, heure);
     ecritSuivi(ss, p, lieu, jour, heure);
 
     /* --- 4. E-mails --- */
-    envoieMails(p, jour, heure, ss.getUrl());
+    envoieMails(p, jour, heure, ins.getUrl());
 
     return reponse({ ok: true });
   } catch (err) {
@@ -113,66 +103,47 @@ function alerteEcritureImpossible(p, err) {
   } catch (e2) { /* ne jamais masquer l'erreur d'origine */ }
 }
 
-/* Aligne une seule fois « Date limite remise » sur la date annoncée par le site. */
-function alignementInitial(ss) {
-  try {
-    var props = PropertiesService.getScriptProperties();
-    if (props.getProperty("DATE_LIMITE_ALIGNEE")) return;
-    props.setProperty("DATE_LIMITE_ALIGNEE", "1");   // une seule fois, quoi qu'il arrive
-    ecritParametre(ss, "Date limite remise", DATE_LIMITE_REMISE);
-  } catch (err) { /* ne doit jamais bloquer une inscription */ }
-}
-
 function doGet() {
-  var ss = classeur();
-  return reponse({ ok: true, message: "Service d'inscription actif.",
-                   classeur: ss.getName(), feuille: ss.getUrl() });
+  return reponse({ ok: true, message: "Service d'inscription actif." });
 }
 
-/* ---------- Le classeur qui reçoit les inscriptions ---------- */
-function classeur() {
+/* ---------- Les classeurs ---------- */
+function classeur() {                 // Prospects (onglets SUIVI)
   return SpreadsheetApp.openById(ID_CLASSEUR);
 }
+function classeurInscriptions() {     // Inscriptions Formation Robotique
+  return SpreadsheetApp.openById(ID_INSCRIPTIONS);
+}
 
-/* Affiche l'adresse du classeur dans le journal (bouton Exécuter) */
+/* Affiche l'adresse des classeurs dans le journal (bouton Exécuter) */
 function ouvrirLaListe() {
-  var ss = classeur();
-  Logger.log("Inscriptions : " + ss.getName() + " — " + ss.getUrl());
-  return ss.getUrl();
+  var a = classeurInscriptions(), b = classeur();
+  Logger.log("Inscriptions : " + a.getName() + " — " + a.getUrl());
+  Logger.log("Prospects    : " + b.getName() + " — " + b.getUrl());
+  return a.getUrl();
 }
 
 /* =========================================================
-   ÉCRITURE — onglet INSCRIPTIONS
+   ÉCRITURE — TOUTES LES INSCRIPTIONS + onglet du jour
+   (classeur « Inscriptions Formation Robotique »)
    ========================================================= */
-function ecritInscription(ss, p, lieu, jour, heure, tarif) {
-  var sh = ongletExistant(ss, ONGLET_INSCRIPTIONS, ENTETES_INSCRIPTIONS);
-  var cols = indexColonnes(sh, ENTETES_INSCRIPTIONS);
+function ecritToutes(ins, p, jour, heure) {
+  var ligne = [new Date(), p.Enfant, p.Age, p.Ville, jour, heure, p.Creneau,
+               p.Parcours, p.Formule, p.Niveau, p.Parent, texte(p.Telephone), p.Email,
+               p.Infos_medicales];
 
-  var valeurs = {
-    "Cle"              : cle(p.Enfant),
-    "Date inscription" : new Date(),
-    "Annee"            : parametre(ss, "Annee scolaire courante", "2026-2027"),
-    "Enfant"           : p.Enfant,
-    "Age"              : p.Age,
-    "Ville"            : p.Ville,
-    "Lieu"             : lieu,
-    "Jour"             : jour,
-    "Heure"            : heure,
-    "Creneau complet"  : p.Creneau,
-    "Parcours"         : p.Parcours,
-    "Formule"          : p.Formule,
-    "Niveau"           : p.Niveau,
-    "Parent"           : p.Parent,
-    "Telephone"        : p.Telephone,
-    "E-mail"           : p.Email,
-    "Tarif base"       : tarif.base,
-    "Remise"           : tarif.remise ? tarif.remise + " %" : "",
-    "Net a payer"      : tarif.net,
-    "Origine"          : "Site",
-    "Notes"            : notes(p)
-  };
+  var toutes = ongletExistant(ins, ONGLET_TOUTES, ENTETES_TOUTES);
+  toutes.appendRow(ligne);
 
-  sh.appendRow(ligneOrdonnee(cols, valeurs, sh.getLastColumn()));
+  var feuilleJour = ongletExistant(ins, jour, ENTETES_TOUTES);
+  feuilleJour.appendRow(ligne);
+  trieParHeure(feuilleJour);
+}
+
+/* Trie un onglet du jour par heure de séance (colonne F), en-tête exclu. */
+function trieParHeure(sh) {
+  var n = sh.getLastRow();
+  if (n > 2) sh.getRange(2, 1, n - 1, ENTETES_TOUTES.length).sort({ column: 6, ascending: true });
 }
 
 /* =========================================================
@@ -193,7 +164,7 @@ function ecritSuivi(ss, p, lieu, jour, heure) {
   var valeurs = {
     "Date"             : new Date(),
     "Nom complet"      : p.Enfant,
-    "Téléphone"        : p.Telephone,
+    "Téléphone"        : texte(p.Telephone),
     "Ville"            : lieu,
     "Âge"              : p.Age,
     "Âge exact"        : ageExact(p.Age),
@@ -224,59 +195,6 @@ function dejaPresent(sh, cols, p) {
     if (cMail && mail && String(lignes[i][cMail - 1]).toLowerCase().trim() === mail)  return true;
   }
   return false;
-}
-
-/* =========================================================
-   TARIF — lu dans les onglets Parametres et Tarifs
-   ========================================================= */
-function calculeTarif(ss, age) {
-  var n = ageExact(age);
-  var base = "";
-
-  var sh = trouveOnglet(ss, ONGLET_TARIFS);
-  if (sh && n !== "" && sh.getLastRow() > 1) {
-    var t = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues();
-    for (var i = 0; i < t.length; i++) {
-      var min = Number(t[i][1]), max = Number(t[i][2]);
-      if (!isNaN(min) && !isNaN(max) && n >= min && n <= max) { base = Number(t[i][3]); break; }
-    }
-  }
-
-  var remise = 0;
-  var pct    = Number(parametre(ss, "Remise rentree", 0));
-  var limite = parametre(ss, "Date limite remise", "");
-  if (pct > 0 && dansLesDelais(limite)) remise = pct;
-
-  var net = (base === "" ) ? "" : Math.round(base * (100 - remise) / 100);
-  return { base: base, remise: remise, net: net };
-}
-
-/* La remise court-elle encore ? (date limite incluse) */
-function dansLesDelais(limite) {
-  if (!limite) return true;                       // pas de date limite renseignée
-  var d = (limite instanceof Date) ? limite : dateFr(String(limite));
-  if (!d) return true;
-  d.setHours(23, 59, 59);
-  return new Date() <= d;
-}
-
-/* "30/09/2026" -> Date */
-function dateFr(txt) {
-  var m = txt.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  return m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null;
-}
-
-/* Lecture d'une ligne de l'onglet Parametres */
-function parametre(ss, nom, defaut) {
-  var sh = trouveOnglet(ss, ONGLET_PARAMETRES);
-  if (!sh || sh.getLastRow() < 2) return defaut;
-  var t = sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues();
-  for (var i = 0; i < t.length; i++) {
-    if (String(t[i][0]).trim().toLowerCase() === String(nom).trim().toLowerCase()) {
-      return t[i][1];
-    }
-  }
-  return defaut;
 }
 
 /* =========================================================
@@ -383,11 +301,6 @@ function ageExact(age) {
   return m ? Number(m[0]) : "";
 }
 
-/* Clé de rapprochement : "Léa Dupont" -> "lea dupont" */
-function cle(nom) {
-  return sansAccent(nom).replace(/\s+/g, " ").trim();
-}
-
 function sansAccent(txt) {
   txt = String(txt || "").toLowerCase();
   var avec = "àáâãäåçèéêëìíîïñòóôõöùúûüýÿ";
@@ -398,6 +311,11 @@ function sansAccent(txt) {
     out += (k === -1) ? txt.charAt(i) : sans.charAt(k);
   }
   return out;
+}
+
+/* Force le texte : "0612…" garde son 0 initial dans le classeur */
+function texte(v) {
+  return v ? "'" + v : "";
 }
 
 function chiffres(txt) {
@@ -540,73 +458,47 @@ function reponse(obj) {
    OUTILS À LANCER À LA MAIN (menu Exécuter de l'éditeur)
    ========================================================= */
 
-/* Écrit une ligne de l'onglet Parametres. Renvoie l'ancienne valeur, ou null. */
-function ecritParametre(ss, nom, valeur) {
-  var sh = trouveOnglet(ss, ONGLET_PARAMETRES);
-  if (!sh || sh.getLastRow() < 2) return null;
-  var t = sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues();
-  for (var i = 0; i < t.length; i++) {
-    if (sansAccent(String(t[i][0])).trim() === sansAccent(nom).trim()) {
-      var avant = t[i][1];
-      if (String(avant).indexOf(valeur) === -1) sh.getRange(i + 2, 2).setValue(valeur);
-      return avant;
-    }
-  }
-  return null;
-}
-
-/* Aligne la date limite de la remise sur celle annoncée par le site. */
-function corrigerDateLimiteRemise() {
-  var ss = classeur();
-  var avant = ecritParametre(ss, "Date limite remise", DATE_LIMITE_REMISE);
-  if (avant === null) {
-    Logger.log("Ligne « Date limite remise » introuvable dans " + ONGLET_PARAMETRES + ".");
-  } else {
-    Logger.log("Date limite remise : " + avant + " -> " + DATE_LIMITE_REMISE);
-  }
-}
-
-/* Vérifie que le script voit le classeur, ses onglets, et qu'il peut y écrire. */
+/* Vérifie que le script voit les deux classeurs, leurs onglets, et peut y écrire. */
 function verifierInstallation() {
-  var ss, souci = 0;
-  try {
-    ss = classeur();
-  } catch (err) {
-    Logger.log("ÉCHEC  Classeur inaccessible : " + err);
-    Logger.log("       Le compte qui exécute ce script n'a pas accès au classeur " + ID_CLASSEUR + ".");
-    Logger.log("       Partagez-le en « Éditeur » avec ce compte, ou recréez le script depuis le compte propriétaire.");
-    return;
-  }
-  Logger.log("Classeur : " + ss.getName());
-
-  var attendus = [ONGLET_INSCRIPTIONS, "SUIVI Metz", "SUIVI Thionville",
-                  ONGLET_PARAMETRES, ONGLET_TARIFS];
-  for (var i = 0; i < attendus.length; i++) {
-    var sh = trouveOnglet(ss, attendus[i]);
-    Logger.log((sh ? "OK     " : "MANQUE ") + attendus[i]);
-    if (!sh) souci++;
-  }
-
-  /* Écriture réellement possible ? */
-  try {
-    var t = trouveOnglet(ss, ONGLET_INSCRIPTIONS);
-    if (t) { t.getRange(1, 1).setValue(t.getRange(1, 1).getValue()); Logger.log("OK     écriture autorisée"); }
-  } catch (err) {
-    Logger.log("ÉCHEC  écriture refusée : " + err);
-    souci++;
-  }
-
-  var tarif = calculeTarif(ss, "10 ans");
-  Logger.log("Tarif 10 ans : " + tarif.base + " € · remise " + tarif.remise + " % · net " + tarif.net + " €");
-  Logger.log("Date limite remise : " + parametre(ss, "Date limite remise", "(absente)")
-             + "  (le site annonce " + DATE_LIMITE_REMISE + ")");
+  var souci = 0;
+  souci += verifieClasseur("Inscriptions", classeurInscriptions, [ONGLET_TOUTES]);
+  souci += verifieClasseur("Prospects", classeur, ["SUIVI Metz", "SUIVI Thionville"]);
   Logger.log(souci === 0 ? "=> Tout est bon." : "=> " + souci + " point(s) à corriger.");
 }
 
+function verifieClasseur(libelle, ouvrir, onglets) {
+  var ss, souci = 0;
+  try {
+    ss = ouvrir();
+  } catch (err) {
+    Logger.log("ÉCHEC  " + libelle + " : classeur inaccessible : " + err);
+    Logger.log("       Partagez-le en « Éditeur » avec le compte qui exécute ce script.");
+    return 1;
+  }
+  Logger.log(libelle + " : " + ss.getName());
+  for (var i = 0; i < onglets.length; i++) {
+    var sh = trouveOnglet(ss, onglets[i]);
+    if (!sh) { Logger.log("MANQUE " + onglets[i]); souci++; continue; }
+    var attendus = (onglets[i] === ONGLET_TOUTES) ? [] : ENTETES_SUIVI;
+    var cols = indexColonnes(sh, attendus), absents = [];
+    for (var a = 0; a < attendus.length; a++) if (!cols[attendus[a]]) absents.push(attendus[a]);
+    if (absents.length) Logger.log("NOTE   " + onglets[i] + " : colonnes introuvables (laissées vides) : " + absents.join(", "));
+    try {
+      sh.getRange(1, 1).setValue(sh.getRange(1, 1).getValue());
+      Logger.log("OK     " + onglets[i] + " (écriture autorisée)");
+    } catch (err) {
+      Logger.log("ÉCHEC  " + onglets[i] + " : écriture refusée : " + err);
+      souci++;
+    }
+  }
+  return souci;
+}
+
 /* Inscription de test complète : écrit dans les onglets, montre le résultat,
-   puis efface les lignes ajoutées. Ne touche à rien d'autre.               */
+   puis efface les lignes ajoutées. Aucun e-mail. Ne touche à rien d'autre.  */
 function testerInscription() {
-  var ss = classeur();
+  var ss  = classeur();
+  var ins = classeurInscriptions();
   var faux = {
     Enfant: "ZZTEST Robot", Age: "11 ans", Ville: "Metz — 9 rue de Sablon",
     Parcours: "🤖 Robotique, IoT & IA",
@@ -620,22 +512,36 @@ function testerInscription() {
   var lieu  = extraitLieu(faux.Ville);
   var jour  = extraitJour(faux.Creneau);
   var heure = extraitHeure(faux.Creneau);
-  var tarif = calculeTarif(ss, faux.Age);
 
-  ecritInscription(ss, faux, lieu, jour, heure, tarif);
-  ecritSuivi(ss, faux, lieu, jour, heure);
+  var onglets = [];
+  try {
+    ecritToutes(ins, faux, jour, heure);
+    ecritSuivi(ss, faux, lieu, jour, heure);
 
-  var a = trouveOnglet(ss, ONGLET_INSCRIPTIONS);
-  var b = trouveOnglet(ss, ONGLET_SUIVI[lieu]);
-  Logger.log("Ligne écrite dans " + ONGLET_INSCRIPTIONS + " (ligne " + a.getLastRow() + ") : "
-             + a.getRange(a.getLastRow(), 1, 1, a.getLastColumn()).getValues()[0].join(" | "));
-  if (b) {
-    Logger.log("Ligne écrite dans " + b.getName() + " (ligne " + b.getLastRow() + ") : "
-               + b.getRange(b.getLastRow(), 1, 1, b.getLastColumn()).getValues()[0].join(" | "));
+    onglets = [trouveOnglet(ins, ONGLET_TOUTES), trouveOnglet(ins, jour),
+               trouveOnglet(ss, ONGLET_SUIVI[lieu])];
+    for (var i = 0; i < onglets.length; i++) {
+      var sh = onglets[i];
+      if (!sh) continue;
+      var l = ligneTest(sh);
+      Logger.log("Ligne écrite dans " + sh.getName() + " (ligne " + l + ") : "
+                 + sh.getRange(l, 1, 1, sh.getLastColumn()).getValues()[0].join(" | "));
+    }
+  } finally {
+    var tous = [trouveOnglet(ins, ONGLET_TOUTES), trouveOnglet(ins, jour),
+                trouveOnglet(ss, ONGLET_SUIVI[lieu])];
+    for (var k = 0; k < tous.length; k++) if (tous[k]) effaceLignesTest(tous[k]);
+    Logger.log("Lignes de test effacées. Aucun e-mail n'a été envoyé.");
   }
+}
 
-  effaceLignesTest(a); if (b) effaceLignesTest(b);
-  Logger.log("Lignes de test effacées. Aucun e-mail n'a été envoyé.");
+/* Numéro de la ligne ZZTEST dans un onglet (la dernière trouvée). */
+function ligneTest(sh) {
+  var v = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
+  for (var l = v.length - 1; l >= 1; l--) {
+    if (v[l].join(" ").indexOf("ZZTEST") !== -1) return l + 1;
+  }
+  return sh.getLastRow();
 }
 
 /* Supprime toutes les lignes contenant ZZTEST dans un onglet. */
