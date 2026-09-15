@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Poste de pilotage LPGR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --ground:#F2F4F8; --surface:#FFFFFF; --ink:#13294B; --muted:#5A6781; --line:#DCE2EC;
+  --navy:#13294B; --navy-ink:#FFFFFF;
+  --red:#D23B3B; --amber:#D99A0B; --green:#1E8F63; --blue:#2F6FDB;
+  --blue-soft:#E6EEFC; --green-soft:#E3F4EC; --amber-soft:#FBF1DA;
+  --focus:#2F6FDB;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1626; --surface:#15213A; --ink:#E8EDF6; --muted:#9AA7BF; --line:#26344F;
+    --navy:#0A1322; --navy-ink:#E8EDF6;
+    --red:#F07070; --amber:#F2C14E; --green:#4CC896; --blue:#7EA8F5;
+    --blue-soft:#1C2E52; --green-soft:#16372C; --amber-soft:#3A2F12; --focus:#7EA8F5;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1626; --surface:#15213A; --ink:#E8EDF6; --muted:#9AA7BF; --line:#26344F;
+  --navy:#0A1322; --navy-ink:#E8EDF6;
+  --red:#F07070; --amber:#F2C14E; --green:#4CC896; --blue:#7EA8F5;
+  --blue-soft:#1C2E52; --green-soft:#16372C; --amber-soft:#3A2F12; --focus:#7EA8F5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.band{background:var(--navy);color:var(--navy-ink)}
+.band-in{max-width:880px;margin:0 auto;padding:28px 20px 22px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin:0 0 4px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,42px);line-height:1.05;margin:0;text-wrap:balance}
+.band p.lede{margin:10px 0 0;max-width:60ch;opacity:.85}
+.leds{display:grid;grid-template-columns:repeat(4,1fr);height:5px}
+.leds span:nth-child(1){background:var(--red)}.leds span:nth-child(2){background:var(--amber)}
+.leds span:nth-child(3){background:var(--green)}.leds span:nth-child(4){background:var(--blue)}
+main{max-width:880px;margin:0 auto;padding:28px 20px 48px;display:grid;gap:34px}
+section{display:grid;gap:12px}
+h2{font-family:var(--display);font-weight:600;font-size:21px;margin:0;line-height:1.2}
+.sub{margin:-8px 0 0;color:var(--muted);font-size:14px}
+
+.primary{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 22px;
+  box-shadow:0 6px 20px -12px rgba(19,41,75,.35);text-decoration:none;color:inherit}
+.primary h3{font-family:var(--display);font-weight:800;font-size:26px;margin:4px 0 2px;line-height:1.1}
+.primary p{margin:0;color:var(--muted);max-width:52ch}
+
+.list{display:grid;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:16px 18px;
+  text-decoration:none;color:inherit;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row h3{font-size:16px;font-weight:700;margin:4px 0 2px}
+.row p{margin:0;color:var(--muted);font-size:14px;max-width:58ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tabs code{font-family:var(--mono);font-size:11.5px;padding:2px 7px;border-radius:5px;background:var(--ground);border:1px solid var(--line);color:var(--ink)}
+
+.kind{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.k-app{background:var(--blue-soft);color:var(--blue)}
+.k-sheet{background:var(--green-soft);color:var(--green)}
+.k-script{background:var(--amber-soft);color:var(--amber)}
+
+.go{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;white-space:nowrap;
+  padding:9px 16px;border-radius:9px;border:1.5px solid var(--line);color:var(--ink);background:var(--surface);transition:background .15s,border-color .15s,color .15s}
+.primary .go{background:var(--blue);border-color:var(--blue);color:#fff;padding:12px 20px;font-size:15px}
+:root[data-theme="dark"] .primary .go{color:#0D1626}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .primary .go{color:#0D1626}}
+a.row:hover .go{border-color:var(--ink)}
+a.row:hover{background:color-mix(in srgb,var(--ground) 55%,var(--surface))}
+a.primary:hover .go{filter:brightness(1.08)}
+a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:12px}
+.arrow{font-family:var(--mono)}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.facts li{border-left:3px solid var(--line);padding:2px 0 2px 12px}
+.facts b{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.facts span{font-weight:700;overflow-wrap:anywhere}
+footer{color:var(--muted);font-size:13px}
+
+@media (max-width:560px){
+  .primary,.row{grid-template-columns:1fr}
+  .go{justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="band-in">
+    <p class="eyebrow">Les Petits Génies de la Robotique · 2026-2027</p>
+    <h1>Poste de pilotage</h1>
+    <p class="lede">Tous les outils des inscriptions au même endroit. Chaque bouton ouvre le fichier dans un nouvel onglet.</p>
+  </div>
+  <div class="leds" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+</header>
+
+<main>
+  <section aria-labelledby="s-jour">
+    <h2 id="s-jour">Au quotidien</h2>
+    <a class="primary" href="https://script.google.com/macros/s/AKfycbzmr098yD6tUISMaYZhop53VAAiYmmBfbSOAWCqPJoq/dev" target="_blank" rel="noopener noreferrer">
+      <div>
+        <span class="kind k-app">Application</span>
+        <h3>Centre de gestion</h3>
+        <p>Inscrits, prospects, rappels, échéances, paiements et séances. Toujours la dernière version du code (adresse <code>/dev</code>).</p>
+      </div>
+      <span class="go">Ouvrir <span class="arrow">↗</span></span>
+    </a>
+  </section>
+
+  <section aria-labelledby="s-classeurs">
+    <h2 id="s-classeurs">Classeurs</h2>
+    <p class="sub">Les données que lit le Centre de gestion.</p>
+    <div class="list">
+      <a class="row" href="https://docs.google.com/spreadsheets/d/16RhXc1AvmCUahgQvdflPor4ajMcx9k9XhxohIFItV-Y/edit" target="_blank" rel="noopener noreferrer">
+        <div>
+          <span class="kind k-sheet">Google Sheets</span>
+          <h3>Inscriptions Formation Robotique</h3>
+          <p>Chaque inscription du site, plus les prospects passés « Inscrit » (recopiés toutes les 15 min).</p>
+          <div class="tabs"><code>TOUTES LES INSCRIPTIONS</code><code>Mercredi</code><code>Samedi</code><code>…un onglet par jour</code></div>
+        </div>
+        <span class="go">Ouvrir <span class="arrow">↗</span></span>
+      </a>
+      <a class="row" href="https://docs.google.com/spreadsheets/d/1yWPFFU_OKvMv0KMPFKUHixbMJLWMzTV5wT2jRZBes8s/edit" target="_blank" rel="noopener noreferrer">
+        <div>
+          <span class="kind k-sheet">Google Sheets</span>
+          <h3>Prospects Essai gratuit Robotique 2026-2027</h3>
+          <p>Leads Meta et site (Metz et Thionville), suivi des appels et statut « Inscrit ».</p>
+          <div class="tabs"><code>Sheet1</code><code>AUTO</code><code>SUIVI</code><code>SUIVI Metz</code><code>SUIVI Thionville</code></div>
+        </div>
+        <span class="go">Ouvrir <span class="arrow">↗</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-script">
+    <h2 id="s-script">Script des inscriptions</h2>
+    <p class="sub">Pour vérifier que tout tourne ou modifier le code.</p>
+    <div class="list">
+      <a class="row" href="https://script.google.com/home/projects/1Tf2MR3LgmCf5q4oVprDFwyn7CRbNuFZ3bii-_fxZUlq35Xgtd8NatR8a/edit" target="_blank" rel="noopener noreferrer">
+        <div>
+          <span class="kind k-script">Apps Script</span>
+          <h3>Éditeur du script</h3>
+          <p>Fichiers <code>Code.gs</code> et <code>SyncProspection.gs</code>. Après une modification, publier une nouvelle version pour le site.</p>
+        </div>
+        <span class="go">Ouvrir <span class="arrow">↗</span></span>
+      </a>
+      <a class="row" href="https://script.google.com/home/projects/1Tf2MR3LgmCf5q4oVprDFwyn7CRbNuFZ3bii-_fxZUlq35Xgtd8NatR8a/executions" target="_blank" rel="noopener noreferrer">
+        <div>
+          <span class="kind k-script">Apps Script</span>
+          <h3>Exécutions</h3>
+          <p>Historique des inscriptions reçues et des synchros, avec les erreurs éventuelles.</p>
+        </div>
+        <span class="go">Ouvrir <span class="arrow">↗</span></span>
+      </a>
+      <a class="row" href="https://script.google.com/home/projects/1Tf2MR3LgmCf5q4oVprDFwyn7CRbNuFZ3bii-_fxZUlq35Xgtd8NatR8a/triggers" target="_blank" rel="noopener noreferrer">
+        <div>
+          <span class="kind k-script">Apps Script</span>
+          <h3>Déclencheurs</h3>
+          <p>La synchro <code>syncInscritsProspection</code> toutes les 15 minutes.</p>
+        </div>
+        <span class="go">Ouvrir <span class="arrow">↗</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-etat">
+    <h2 id="s-etat">Repères</h2>
+    <ul class="facts">
+      <li><b>Formulaire du site</b><span>Version 5 · 15 sept. 2026</span></li>
+      <li><b>Synchro prospects → inscriptions</b><span>Toutes les 15 min</span></li>
+      <li><b>Contact académie</b><span>robotics.academy.contact@gmail.com</span></li>
+    </ul>
+  </section>
+
+  <footer>Les fichiers s'ouvrent avec le compte Google connecté dans le navigateur.</footer>
+</main>
+
+</body>
+</html>
