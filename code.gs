@@ -96,6 +96,7 @@ function alerteEcritureImpossible(p, err) {
       + tr("Créneau", p.Creneau) + tr("Parcours", p.Parcours) + tr("Formule", p.Formule)
       + tr("Niveau", p.Niveau) + tr("Parent", p.Parent) + tr("Téléphone", p.Telephone)
       + tr("E-mail", p.Email) + tr("Infos médicales", p.Infos_medicales)
+      + lignesComplements(p)
       + "</table>";
     MailApp.sendEmail({ to: EMAIL_ACADEMIE,
       subject: "⚠️ Inscription NON enregistrée — " + (p.Enfant || "?"),
@@ -171,6 +172,7 @@ function ecritSuivi(ss, p, lieu, jour, heure) {
     "Créneau souhaité" : creneauCourt(jour, heure, p.Creneau, lieu),
     "Source"           : "Site",
     "Doublon ?"        : dejaPresent(sh, cols, p) ? "Doublon" : "",
+    "Essai prévu le"   : p.Date_essai || "",
     "Inscrit ?"        : estUneInscription(p.Formule) ? "Inscrit" : "",
     "Notes"            : notes(p),
     "E-mail"           : p.Email
@@ -337,6 +339,12 @@ function notes(p) {
   if (p.Infos_medicales && p.Infos_medicales !== "—") {
     bouts.push("Infos médicales : " + p.Infos_medicales);
   }
+  if (p.Creneau_secours) bouts.push("Secours : " + p.Creneau_secours);
+  if (p.Date_essai)      bouts.push("Essai le " + p.Date_essai);
+  if (p.Date_naissance)  bouts.push("Né(e) le " + p.Date_naissance);
+  if (p.Paiement)        bouts.push("Paiement : " + p.Paiement + (p.Moyen_paiement ? " / " + p.Moyen_paiement : ""));
+  if (p.Reductions)      bouts.push("Réductions : " + p.Reductions);
+  if (p.Fratrie)         bouts.push("Fratrie : " + p.Fratrie);
   return bouts.join(" · ");
 }
 
@@ -418,6 +426,7 @@ function envoieMails(p, jour, heure, urlFeuille) {
     + tr("Parcours", p.Parcours) + tr("Formule", p.Formule) + tr("Niveau", p.Niveau)
     + tr("Parent", p.Parent) + tr("Téléphone", p.Telephone) + tr("E-mail", p.Email)
     + tr("Infos médicales", p.Infos_medicales)
+    + lignesComplements(p)
     + "</table>"
     + "<p style='font-family:Arial;font-size:13px'>📋 <a href='" + urlFeuille + "'>Ouvrir le classeur des prospects et inscriptions</a></p>";
   MailApp.sendEmail({ to: EMAIL_ACADEMIE, subject: sujetAcad, htmlBody: corpsAcad, replyTo: p.Email });
@@ -434,6 +443,9 @@ function envoieMails(p, jour, heure, urlFeuille) {
       + "<table style='font-size:14px;border-collapse:collapse'>"
       + tr("Ville", p.Ville) + tr("Jour", jour) + tr("Heure", heure) + tr("Créneau", p.Creneau)
       + tr("Parcours", p.Parcours) + tr("Formule", p.Formule)
+      + (p.Creneau_secours ? tr("Créneau de secours", p.Creneau_secours) : "")
+      + (p.Date_essai ? tr("Séance d'essai", p.Date_essai) : "")
+      + (p.Paiement ? tr("Paiement", p.Paiement + (p.Moyen_paiement ? " · " + p.Moyen_paiement : "")) : "")
       + "</table>"
       + "<p>Nous vous recontactons très vite pour confirmer le groupe et vous communiquer le tarif.</p>"
       + "<p>📞 " + TEL_ACADEMIE + " &nbsp;·&nbsp; 💬 WhatsApp : " + TEL_ACADEMIE + "<br>"
@@ -441,6 +453,27 @@ function envoieMails(p, jour, heure, urlFeuille) {
       + "<p>À bientôt !<br><strong>Les Petits Génies de la Robotique</strong> 🤖</p></div>";
     MailApp.sendEmail({ to: p.Email, subject: sujetParent, htmlBody: corpsParent, replyTo: EMAIL_ACADEMIE });
   }
+}
+
+/* Compléments de la fiche d'inscription 2026-2027 (e-mails + Notes, pas de colonne en plus) */
+var COMPLEMENTS = [
+  ["Date_naissance", "Date de naissance"], ["Ecole", "École / classe"],
+  ["Creneau_secours", "Créneau de secours"], ["Date_essai", "Date séance d'essai"],
+  ["Lien", "Lien avec l'enfant"], ["Adresse", "Adresse"],
+  ["Urgence_contact", "Contact d'urgence"], ["Urgence_tel", "Tél. urgence"],
+  ["Paiement", "Paiement"], ["Moyen_paiement", "Moyen de paiement"],
+  ["Reductions", "Réductions demandées"], ["Fratrie", "Frère / sœur inscrit(e)"],
+  ["Autorisation_photos", "Photos / vidéos"], ["Autorisation_sortie_seul", "Quitte seul l'atelier"],
+  ["Autorisation_mesures_urgence", "Mesures d'urgence"],
+  ["Reglement_accepte", "Règlement intérieur"], ["Donnees_acceptees", "Données personnelles"]
+];
+
+function lignesComplements(p) {
+  var html = "";
+  for (var i = 0; i < COMPLEMENTS.length; i++) {
+    if (p[COMPLEMENTS[i][0]]) html += tr(COMPLEMENTS[i][1], p[COMPLEMENTS[i][0]]);
+  }
+  return html;
 }
 
 function tr(cle, valeur) {
@@ -502,8 +535,10 @@ function testerInscription() {
   var faux = {
     Enfant: "ZZTEST Robot", Age: "11 ans", Ville: "Metz — 9 rue de Sablon",
     Parcours: "🤖 Robotique, IoT & IA",
-    Formule: "Formation annuelle — 1 séance / semaine (1h ou 1h30 selon l'âge)",
-    Creneau: "🌥️ Mercredi — 13h30 à 15h00 (1h30 · 10 ans et +)",
+    Formule: "Formation annuelle — 1 séance / semaine (1h30)",
+    Creneau: "🌤️ Mercredi — 14h00 à 15h30 (1h30 · 10 ans et +)",
+    Creneau_secours: "❄️ Samedi — 10h30 à 12h00 (1h30 · 10 ans et +)",
+    Paiement: "En 3 fois", Moyen_paiement: "Virement",
     Niveau: "Débutant — aucune connaissance", Parent: "Test Automatique",
     Telephone: "0600000000", Email: "test@example.com", Infos_medicales: "—",
     Cle: CLE_SITE, Piege: "", Duree: "42", Origine: "test"
