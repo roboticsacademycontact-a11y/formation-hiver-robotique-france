@@ -36,7 +36,9 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
 .band{background:var(--navy);color:var(--navy-ink)}
-.band-in{max-width:880px;margin:0 auto;padding:28px 20px 22px}
+.band-in{max-width:880px;margin:0 auto;padding:24px 20px 22px;display:flex;align-items:center;gap:22px}
+.logo{flex:none;width:112px;height:112px;border-radius:50%;background:#fff;padding:4px;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.logo img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
 .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin:0 0 4px}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,42px);line-height:1.05;margin:0;text-wrap:balance}
 .band p.lede{margin:10px 0 0;max-width:60ch;opacity:.85}
@@ -67,6 +69,10 @@ h2{font-family:var(--display);font-weight:600;font-size:21px;margin:0;line-heigh
 .k-app{background:var(--blue-soft);color:var(--blue)}
 .k-sheet{background:var(--green-soft);color:var(--green)}
 .k-script{background:var(--amber-soft);color:var(--amber)}
+.k-form{background:var(--green-soft);color:var(--green)}
+.primary.form .go{background:var(--green);border-color:var(--green)}
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.flow li{font-size:12.5px;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--ground);border:1px solid var(--line)}
 .k-site{background:var(--ground);color:var(--ink);border:1px solid var(--line)}
 
 .go{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;white-space:nowrap;
@@ -87,6 +93,8 @@ a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:
 footer{color:var(--muted);font-size:13px}
 
 @media (max-width:560px){
+  .band-in{gap:14px}
+  .logo{width:76px;height:76px}
   .primary,.row{grid-template-columns:1fr}
   .go{justify-self:start}
 }
@@ -97,9 +105,12 @@ footer{color:var(--muted);font-size:13px}
 
 <header class="band">
   <div class="band-in">
+    <div class="logo"><img src="logo-10ans.jpg" alt="Les Petits Génies de la Robotique France — 10 ans d'expérience" width="112" height="112"></div>
+    <div>
     <p class="eyebrow">Les Petits Génies de la Robotique · 2026-2027</p>
     <h1>Poste de pilotage</h1>
     <p class="lede">Tous les outils des inscriptions au même endroit. Chaque bouton ouvre le fichier dans un nouvel onglet.</p>
+    </div>
   </div>
   <div class="leds" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 </header>
@@ -114,6 +125,20 @@ footer{color:var(--muted);font-size:13px}
         <p>Inscrits, prospects, rappels, échéances, paiements et séances. Toujours la dernière version du code (adresse <code>/dev</code>).</p>
       </div>
       <span class="go">Ouvrir <span class="arrow">↗</span></span>
+    </a>
+    <a class="primary form" href="https://roboticsacademycontact-a11y.github.io/formation-hiver-robotique-france/#inscription" target="_blank" rel="noopener noreferrer">
+      <div>
+        <span class="kind k-form">Formulaire</span>
+        <h3>Fiche d'inscription</h3>
+        <p>La fiche d'inscription 2026-2027 en ligne, pour un parent ou pour une inscription prise au téléphone. Un seul envoi l'enregistre partout :</p>
+        <ul class="flow">
+          <li>TOUTES LES INSCRIPTIONS + onglet du jour</li>
+          <li>SUIVI Metz / Thionville</li>
+          <li>Centre de gestion</li>
+          <li>E-mails académie et parent</li>
+        </ul>
+      </div>
+      <span class="go">Remplir <span class="arrow">↗</span></span>
     </a>
   </section>
 
