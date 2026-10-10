@@ -267,7 +267,7 @@ function ligneOrdonnee(cols, valeurs, largeur) {
    LECTURE DES INFORMATIONS DU FORMULAIRE
    ========================================================= */
 
-/* "Metz — 9 rue de Sablon" -> "Metz" */
+/* "Metz — 66 rue du 20ème Corps Américain, 57000" -> "Metz" */
 function extraitLieu(ville) {
   var v = sansAccent(ville || "");
   if (v.indexOf("thionville") !== -1) return "Thionville";
@@ -345,6 +345,7 @@ function notes(p) {
   if (p.Paiement)        bouts.push("Paiement : " + p.Paiement + (p.Moyen_paiement ? " / " + p.Moyen_paiement : ""));
   if (p.Reductions)      bouts.push("Réductions : " + p.Reductions);
   if (p.Fratrie)         bouts.push("Fratrie : " + p.Fratrie);
+  if (p.Vacances) bouts.push("Stage vacances : " + p.Vacances + (p.Creneau_stage ? " · " + p.Creneau_stage : ""));
   return bouts.join(" · ");
 }
 
@@ -439,17 +440,18 @@ function envoieMails(p, jour, heure, urlFeuille) {
       + "<p>Bonjour " + p.Parent + ",</p>"
       + "<p>Nous avons bien reçu l'inscription de <strong>" + p.Enfant + "</strong> (" + p.Age
       + ") à la Formation Robotique des <strong>Petits Génies de la Robotique</strong> "
-      + "(rentrée le 7 octobre, jusqu'au 30 juin).</p>"
+      + "(rentrée le 5 octobre, jusqu'au 30 juin).</p>"
       + "<table style='font-size:14px;border-collapse:collapse'>"
       + tr("Ville", p.Ville) + tr("Jour", jour) + tr("Heure", heure) + tr("Créneau", p.Creneau)
       + tr("Parcours", p.Parcours) + tr("Formule", p.Formule)
       + (p.Creneau_secours ? tr("Créneau de secours", p.Creneau_secours) : "")
       + (p.Date_essai ? tr("Séance d'essai", p.Date_essai) : "")
++ (p.Vacances ? tr("Stage vacances", p.Vacances + (p.Creneau_stage ? " · " + p.Creneau_stage : "")) : "")
       + (p.Paiement ? tr("Paiement", p.Paiement + (p.Moyen_paiement ? " · " + p.Moyen_paiement : "")) : "")
       + "</table>"
       + "<p>Nous vous recontactons très vite pour confirmer le groupe et vous communiquer le tarif.</p>"
       + "<p>📞 " + TEL_ACADEMIE + " &nbsp;·&nbsp; 💬 WhatsApp : " + TEL_ACADEMIE + "<br>"
-      + "📍 9, rue de Sablon, Metz &nbsp;·&nbsp; 📍 6, rue de la Tour, 57100 Thionville</p>"
+      + "📍 66 rue du 20ème Corps Américain, 57000 Metz &nbsp;·&nbsp; 📍 6, rue de la Tour, 57100 Thionville</p>"
       + "<p>À bientôt !<br><strong>Les Petits Génies de la Robotique</strong> 🤖</p></div>";
     MailApp.sendEmail({ to: p.Email, subject: sujetParent, htmlBody: corpsParent, replyTo: EMAIL_ACADEMIE });
   }
@@ -463,7 +465,8 @@ var COMPLEMENTS = [
   ["Urgence_contact", "Contact d'urgence"], ["Urgence_tel", "Tél. urgence"],
   ["Paiement", "Paiement"], ["Moyen_paiement", "Moyen de paiement"],
   ["Reductions", "Réductions demandées"], ["Fratrie", "Frère / sœur inscrit(e)"],
-  ["Autorisation_photos", "Photos / vidéos"], ["Autorisation_sortie_seul", "Quitte seul l'atelier"],
+  ["Vacances", "Vacances (stage)"], ["Creneau_stage", "Créneau du stage"],
+["Autorisation_photos", "Photos / vidéos"], ["Autorisation_sortie_seul", "Quitte seul l'atelier"],
   ["Autorisation_mesures_urgence", "Mesures d'urgence"],
   ["Reglement_accepte", "Règlement intérieur"], ["Donnees_acceptees", "Données personnelles"]
 ];
@@ -533,7 +536,7 @@ function testerInscription() {
   var ss  = classeur();
   var ins = classeurInscriptions();
   var faux = {
-    Enfant: "ZZTEST Robot", Age: "11 ans", Ville: "Metz — 9 rue de Sablon",
+    Enfant: "ZZTEST Robot", Age: "11 ans", Ville: "Metz — 66 rue du 20ème Corps Américain, 57000",
     Parcours: "🤖 Robotique, IoT & IA",
     Formule: "Formation annuelle — 1 séance / semaine (1h30)",
     Creneau: "🌤️ Mercredi — 14h00 à 15h30 (1h30 · 10 ans et +)",
